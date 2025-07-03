@@ -1,12 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Mic, MessageCircle, MapPin, Sun, Lightbulb } from "lucide-react";
+import { useLanguage, translations } from "@/hooks/useLanguage";
 
 interface DashboardScreenProps {
   onNavigate: (screen: string) => void;
 }
 
 const DashboardScreen = ({ onNavigate }: DashboardScreenProps) => {
+  const { language } = useLanguage();
   const quickActions = [
     {
       icon: MessageCircle,
@@ -47,13 +49,13 @@ const DashboardScreen = ({ onNavigate }: DashboardScreenProps) => {
       {/* Header */}
       <div className="text-center pt-4 space-y-2">
         <h1 className="text-2xl font-bold font-cairo text-primary">
-          أهلا وسهلا
+          {language === 'darija' ? 'أهلا وسهلا' : 'Bienvenue'}
         </h1>
         <h2 className="text-xl font-semibold font-inter text-foreground">
-          Bienvenue sur FatimaAI
+          {translations.dashboard[language]}
         </h2>
         <p className="text-sm text-muted-foreground font-inter">
-          Votre assistante personnelle tunisienne
+          {translations.subtitle[language]}
         </p>
       </div>
 

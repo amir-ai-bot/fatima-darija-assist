@@ -14,6 +14,13 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
   const [darkMode, setDarkMode] = useState(false);
   const [language, setLanguage] = useState<'darija' | 'french'>('french');
 
+  const updateLanguage = (newLanguage: 'darija' | 'french') => {
+    setLanguage(newLanguage);
+    localStorage.setItem('app-language', newLanguage);
+    // Trigger a custom event to notify other components
+    window.dispatchEvent(new CustomEvent('languageChanged', { detail: newLanguage }));
+  };
+
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
     document.documentElement.classList.toggle('dark');
@@ -116,7 +123,7 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
                   {language === 'french' ? 'French / Français' : 'Tunisian Darija'}
                 </p>
               </div>
-              <Button variant="outline" onClick={toggleLanguage}>
+              <Button variant="outline" onClick={() => updateLanguage(language === 'french' ? 'darija' : 'french')}>
                 {language === 'french' ? 'عربي' : 'FR'}
               </Button>
             </div>
