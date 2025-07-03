@@ -132,7 +132,7 @@ const DashboardScreen = ({ onNavigate }: DashboardScreenProps) => {
       {/* Footer */}
       <div className="text-center pt-8 pb-4">
         <p className="text-xs text-muted-foreground font-inter">
-          Fait avec ❤️ pour la Tunisie 🇹🇳
+          Fait avec Yassin_Dev pour la Tunisie 🇹🇳
         </p>
       </div>
     </div>
