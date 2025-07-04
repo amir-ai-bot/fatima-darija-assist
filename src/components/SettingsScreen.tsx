@@ -1,18 +1,62 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Switch } from "@/components/ui/switch";
-import { Moon, Sun, Languages, User, Info, Heart } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Moon, Sun, Languages, User, Info, Heart, Smile } from "lucide-react";
 import fatimaAvatar from "@/assets/fatima-avatar.png";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface SettingsScreenProps {
   onBack: () => void;
 }
 
 const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
+  const { user } = useAuth();
+  const { toast } = useToast();
   const [darkMode, setDarkMode] = useState(false);
   const [language, setLanguage] = useState<'darija' | 'french'>('french');
+  const [personality, setPersonality] = useState('friendly_warm');
+  const [profile, setProfile] = useState<any>(null);
+
+  useEffect(() => {
+    if (user) {
+      fetchProfile();
+    }
+  }, [user]);
+
+  const fetchProfile = async () => {
+    if (!user) return;
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('user_id', user.id)
+      .single();
+    if (error) {
+      console.error('Error fetching profile:', error);
+    } else if (data) {
+      setProfile(data);
+      setLanguage(data.preferred_language || 'french');
+      setPersonality(data.personality || 'friendly_warm');
+    }
+  };
+
+  const updateProfile = async (updates: any) => {
+    if (!user) return;
+    const { error } = await supabase
+      .from('profiles')
+      .update(updates)
+      .eq('user_id', user.id);
+    if (error) {
+      toast({ title: "Erreur", description: "Impossible de mettre à jour le profil.", variant: "destructive" });
+    } else {
+      toast({ title: "Profil mis à jour!", description: "Vos préférences ont été enregistrées." });
+      fetchProfile(); // Refresh profile data
+    }
+  };
 
   const updateLanguage = (newLanguage: 'darija' | 'french') => {
     setLanguage(newLanguage);
@@ -26,8 +70,14 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
     document.documentElement.classList.toggle('dark');
   };
 
-  const toggleLanguage = () => {
-    setLanguage(prev => prev === 'french' ? 'darija' : 'french');
+  const handleLanguageChange = (newLanguage: 'darija' | 'french') => {
+    setLanguage(newLanguage);
+    updateProfile({ preferred_language: newLanguage });
+  };
+
+  const handlePersonalityChange = (newPersonality: string) => {
+    setPersonality(newPersonality);
+    updateProfile({ personality: newPersonality });
   };
 
   return (
@@ -123,10 +173,35 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
                   {language === 'french' ? 'French / Français' : 'Tunisian Darija'}
                 </p>
               </div>
-              <Button variant="outline" onClick={() => updateLanguage(language === 'french' ? 'darija' : 'french')}>
+              <Button variant="outline" onClick={() => handleLanguageChange(language === 'french' ? 'darija' : 'french')}>
                 {language === 'french' ? 'عربي' : 'FR'}
               </Button>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Personality Settings */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Smile className="w-5 h-5" />
+              <span className="font-inter">Personnalité de Fatima</span>
+            </CardTitle>
+            <CardDescription className="font-cairo text-right">
+              شخصية فاطمة
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Select value={personality} onValueChange={handlePersonalityChange}>
+              <SelectTrigger>
+                <SelectValue placeholder="Choisissez une personnalité" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="friendly_warm">Amicale et chaleureuse</SelectItem>
+                <SelectItem value="funny_sassy">Drôle et taquine</SelectItem>
+                <SelectItem value="wise_calm">Sage et calme</SelectItem>
+              </SelectContent>
+            </Select>
           </CardContent>
         </Card>
 

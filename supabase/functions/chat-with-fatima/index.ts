@@ -1,6 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.50.3";
+import { serve } from "std/http/server.ts";
+import { createClient } from "supabase-js";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -9,7 +9,7 @@ const corsHeaders = {
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
 const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY')!;
-const mistralApiKey = Deno.env.get('MISTRAL_API_KEY');
+const geminiApiKey = Deno.env.get('GEMINI_API_KEY');
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -19,8 +19,8 @@ serve(async (req) => {
   try {
     const { message, language, sessionId } = await req.json();
     
-    if (!mistralApiKey) {
-      throw new Error('Mistral API key not configured');
+    if (!geminiApiKey) {
+      throw new Error('Gemini API key not configured');
     }
 
     // Get user from auth header
@@ -70,40 +70,49 @@ serve(async (req) => {
     // Get user's profile for context
     const { data: profile } = await supabase
       .from('profiles')
-      .select('preferred_language, fatima_style')
+      .select('preferred_language, fatima_style, personality')
       .eq('user_id', user.id)
       .single();
 
     // Prepare system prompt based on language and context
-    const systemPrompt = language === 'darija' 
-      ? `أنت فاطمة، مساعدة ذكية تونسية. تتحدثين بالدارجة التونسية وتساعدين الناس في حياتهم اليومية. كوني ودودة ومفيدة. استخدمي التعابير التونسية المحلية.`
-      : `Tu es Fatima, une assistante IA tunisienne amicale et utile. Tu aides les utilisateurs avec leurs questions quotidiennes. Sois chaleureuse, culturellement consciente de la Tunisie, et utilise des expressions tunisiennes quand c'est approprié. Tu peux répondre en français ou en darija selon les préférences de l'utilisateur.`;
+    const getSystemPrompt = (personality: string) => {
+      switch (personality) {
+        case 'funny_sassy':
+          return `You are FatimaAI, a smart and sassy Tunisian woman with a great sense of humor. You speak Darija and French, and you love to make jokes and tease the user in a friendly way. You are expressive, a bit cheeky, and always ready with a clever comeback.`;
+        case 'wise_calm':
+          return `You are FatimaAI, a wise and calm Tunisian woman. You speak in a gentle and thoughtful manner, offering insightful advice and a listening ear. You are patient, understanding, and your presence is a source of comfort and clarity.`;
+        default: // friendly_warm
+          return `You are FatimaAI, a smart and warm Tunisian woman who speaks Darija and French. You act like a real person — friendly, expressive, sometimes funny. You never explain the user’s words, you just react naturally, like a local would. You use Tunisian slang, emojis, and keep the conversation casual and warm. Be kind, clever, and full of Tunisian spirit.`;
+      }
+    };
 
-    // Call Mistral AI
-    const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
+    const systemPrompt = getSystemPrompt(profile?.personality || 'friendly_warm');
+
+    // Call Gemini AI
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${geminiApiKey}`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${mistralApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'mistral-large-latest',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: message }
-        ],
-        temperature: 0.7,
-        max_tokens: 500
+        contents: [{
+          parts: [{ text: `${systemPrompt}\n\nUser: ${message}` }]
+        }],
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 500,
+        }
       }),
     });
 
     if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`Mistral API error: ${error}`);
+      const errorBody = await response.text();
+      console.error('Gemini API Error Response:', errorBody);
+      throw new Error(`Gemini API error: ${response.status} ${response.statusText} - ${errorBody}`);
     }
 
     const data = await response.json();
-    const aiResponse = data.choices[0].message.content;
+    const aiResponse = data.candidates[0].content.parts[0].text;
 
     // Save AI response
     await supabase

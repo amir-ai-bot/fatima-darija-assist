@@ -1,15 +1,18 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Settings } from "lucide-react";
+import { Settings, Loader2 } from "lucide-react";
 import WelcomeScreen from "@/components/WelcomeScreen";
 import DashboardScreen from "@/components/DashboardScreen";
 import ChatScreen from "@/components/ChatScreen";
 import VoiceScreen from "@/components/VoiceScreen";
 import SettingsScreen from "@/components/SettingsScreen";
+import AuthScreen from "@/components/AuthScreen";
+import { useAuth } from "@/hooks/useAuth";
 
 type Screen = 'welcome' | 'dashboard' | 'chat' | 'voice' | 'translate' | 'places' | 'settings';
 
 const Index = () => {
+  const { user, loading } = useAuth();
   const [currentScreen, setCurrentScreen] = useState<Screen>('welcome');
 
   const navigateToScreen = (screen: Screen) => {
@@ -24,7 +27,19 @@ const Index = () => {
     setCurrentScreen('dashboard');
   };
 
-  const renderScreen = () => {
+  const renderContent = () => {
+    if (loading) {
+      return (
+        <div className="min-h-screen flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin" />
+        </div>
+      );
+    }
+
+    if (!user) {
+      return <AuthScreen onSuccess={() => {}} />;
+    }
+
     switch (currentScreen) {
       case 'welcome':
         return <WelcomeScreen onStart={handleStart} />;
@@ -79,7 +94,7 @@ const Index = () => {
 
   return (
     <div className="max-w-md mx-auto min-h-screen bg-background relative overflow-hidden">
-      {renderScreen()}
+      {renderContent()}
     </div>
   );
 };

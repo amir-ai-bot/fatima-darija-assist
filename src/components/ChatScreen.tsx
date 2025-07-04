@@ -1,7 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowUp, Mic } from "lucide-react";
+import { ArrowUp, Mic, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/components/ui/use-toast";
+import { useVoiceRecognition } from "@/hooks/useVoiceRecognition";
 
 interface Message {
   id: string;
@@ -16,68 +20,118 @@ interface ChatScreenProps {
 }
 
 const ChatScreen = ({ onBack }: ChatScreenProps) => {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      text: 'السلام عليكم! كيفاش نجم نعاونك اليوم؟',
-      isUser: false,
-      language: 'darija',
-      timestamp: new Date()
-    },
-    {
-      id: '2', 
-      text: 'Salut ! Comment puis-je t\'aider aujourd\'hui ?',
-      isUser: false,
-      language: 'french',
-      timestamp: new Date()
-    }
-  ]);
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
-  const [isListening, setIsListening] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSendMessage = () => {
-    if (!inputText.trim()) return;
+  useEffect(() => {
+    const fetchHistory = async () => {
+      if (!sessionId) return;
 
-    const newMessage: Message = {
+      const { data, error } = await supabase
+        .from('chat_messages')
+        .select('*')
+        .eq('session_id', sessionId)
+        .order('created_at', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching chat history:', error);
+        toast({
+          title: "Error",
+          description: "Could not load previous messages.",
+          variant: "destructive",
+        });
+      } else if (data) {
+        const loadedMessages = data.map((msg: any) => ({
+          id: msg.id,
+          text: msg.content,
+          isUser: msg.is_user_message,
+          language: msg.language,
+          timestamp: new Date(msg.created_at),
+        }));
+        setMessages(loadedMessages);
+      }
+    };
+
+    fetchHistory();
+  }, [sessionId, toast]);
+
+  const handleSendMessage = async () => {
+    const messageText = inputText.trim();
+    if (!messageText || !user) return;
+
+    const userMessage: Message = {
       id: Date.now().toString(),
-      text: inputText,
+      text: messageText,
       isUser: true,
-      language: 'french',
+      language: 'french', // Or detect language
       timestamp: new Date()
     };
 
-    setMessages(prev => [...prev, newMessage]);
+    setMessages(prev => [...prev, userMessage]);
     setInputText('');
+    setIsLoading(true);
+    setError(null);
 
-    // Simulate AI response
-    setTimeout(() => {
-      const responses = [
-        'ماشي، فهمت عليك! خلاص نحل ليك هاك الحاجة.',
-        'D\'accord, je comprends ! Je vais t\'aider avec ça.',
-        'الطقس اليوم باهي، نسمة حلوة في تونس!',
-        'C\'est une excellente question ! Laisse-moi réfléchir...'
-      ];
-      
-      const response: Message = {
+    try {
+      const { data, error } = await supabase.functions.invoke('chat-with-fatima', {
+        body: {
+          message: messageText,
+          language: 'french', // Pass selected language
+          sessionId: sessionId
+        }
+      });
+
+      if (error) throw error;
+
+      const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: responses[Math.floor(Math.random() * responses.length)],
+        text: data.response,
         isUser: false,
-        language: Math.random() > 0.5 ? 'darija' : 'french',
+        language: data.language,
         timestamp: new Date()
       };
-      
-      setMessages(prev => [...prev, response]);
-    }, 1000);
+
+      setMessages(prev => [...prev, aiMessage]);
+      if (data.sessionId) {
+        setSessionId(data.sessionId);
+      }
+
+    } catch (err: any) {
+      setError('Failed to get response from Fatima. Please try again.');
+      toast({
+        title: "Error",
+        description: err.message || 'An unexpected error occurred.',
+        variant: "destructive",
+      });
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const toggleVoice = () => {
-    setIsListening(!isListening);
-    // Simulate voice recognition
-    if (!isListening) {
-      setTimeout(() => {
-        setIsListening(false);
-        setInputText("شنوة الطقس اليوم؟");
-      }, 2000);
+  const { isListening, startListening, stopListening } = useVoiceRecognition({
+    onResult: (result) => {
+      setInputText(result);
+    },
+    onError: (error) => {
+      toast({
+        title: "Voice Error",
+        description: `Speech recognition error: ${error}`,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleVoiceButtonClick = () => {
+    if (isListening) {
+      stopListening();
+    } else {
+      startListening('fr-FR'); // Or 'ar-TN' for Darija
     }
   };
 
@@ -145,7 +199,7 @@ const ChatScreen = ({ onBack }: ChatScreenProps) => {
           <Button
             variant="voice"
             size="voice"
-            onClick={toggleVoice}
+            onClick={handleVoiceButtonClick}
             className={isListening ? 'voice-wave' : ''}
           >
             <Mic className="w-6 h-6" />
@@ -159,14 +213,15 @@ const ChatScreen = ({ onBack }: ChatScreenProps) => {
               placeholder="Tapez votre message..."
               className="flex-1 bg-transparent border-none outline-none font-inter"
               onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+              disabled={isLoading || !user}
             />
             <Button
               size="icon"
               onClick={handleSendMessage}
-              disabled={!inputText.trim()}
+              disabled={!inputText.trim() || isLoading || !user}
               className="w-8 h-8 rounded-full"
             >
-              <ArrowUp className="w-4 h-4" />
+              {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <ArrowUp className="w-4 h-4" />}
             </Button>
           </div>
         </div>
