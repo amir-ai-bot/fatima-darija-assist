@@ -6,7 +6,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const mistralApiKey = Deno.env.get('MISTRAL_API_KEY');
+const geminiApiKey = Deno.env.get('GEMINI_API_KEY');
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -14,8 +14,8 @@ serve(async (req) => {
   }
 
   try {
-    if (!mistralApiKey) {
-      throw new Error('Mistral API key not configured');
+    if (!geminiApiKey) {
+      throw new Error('Gemini API key not configured');
     }
 
     const today = new Date();
@@ -43,31 +43,32 @@ serve(async (req) => {
     - Weather (Saturday)
     - Common sayings (Sunday)`;
 
-    const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${geminiApiKey}`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${mistralApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'mistral-large-latest',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: `Generate today's tip for ${dayOfWeek}` }
-        ],
-        temperature: 0.7,
-        max_tokens: 150,
+        contents: [{
+          parts: [{
+            text: `${systemPrompt}\n\nGenerate today's tip for ${dayOfWeek}`
+          }]
+        }],
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 150,
+        }
       }),
     });
 
     if (!response.ok) {
       const errorBody = await response.text();
-      console.error('Mistral API Error Response:', errorBody);
-      throw new Error(`Mistral API error: ${response.status} ${response.statusText}`);
+      console.error('Gemini API Error Response:', errorBody);
+      throw new Error(`Gemini API error: ${response.status} ${response.statusText}`);
     }
 
     const data = await response.json();
-    const tipContent = data.choices[0].message.content;
+    const tipContent = data.candidates[0].content.parts[0].text;
 
     // Parse the response to extract French and Arabic parts
     const lines = tipContent.split('\n').filter(line => line.trim());

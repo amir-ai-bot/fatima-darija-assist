@@ -6,7 +6,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const mistralApiKey = Deno.env.get('MISTRAL_API_KEY');
+const geminiApiKey = Deno.env.get('GEMINI_API_KEY');
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -16,39 +16,40 @@ serve(async (req) => {
   try {
     const { text, direction } = await req.json();
     
-    if (!mistralApiKey) {
-      throw new Error('Mistral API key not configured');
+    if (!geminiApiKey) {
+      throw new Error('Gemini API key not configured');
     }
 
     const systemPrompt = direction === 'darija-french' 
       ? `You are a Tunisian Darija to French translator. Translate the following Tunisian Arabic (Darija) text to French. Keep the tone and meaning intact. Only provide the translation, nothing else.`
       : `You are a French to Tunisian Darija translator. Translate the following French text to Tunisian Arabic (Darija). Keep the tone and meaning intact. Only provide the translation in Arabic script, nothing else.`;
 
-    const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${geminiApiKey}`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${mistralApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'mistral-large-latest',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: text }
-        ],
-        temperature: 0.3,
-        max_tokens: 200,
+        contents: [{
+          parts: [{
+            text: `${systemPrompt}\n\n${text}`
+          }]
+        }],
+        generationConfig: {
+          temperature: 0.3,
+          maxOutputTokens: 200,
+        }
       }),
     });
 
     if (!response.ok) {
       const errorBody = await response.text();
-      console.error('Mistral API Error Response:', errorBody);
-      throw new Error(`Mistral API error: ${response.status} ${response.statusText}`);
+      console.error('Gemini API Error Response:', errorBody);
+      throw new Error(`Gemini API error: ${response.status} ${response.statusText}`);
     }
 
     const data = await response.json();
-    const translation = data.choices[0].message.content;
+    const translation = data.candidates[0].content.parts[0].text;
 
     return new Response(
       JSON.stringify({ translation }),
