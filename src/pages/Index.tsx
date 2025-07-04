@@ -7,6 +7,8 @@ import ChatScreen from "@/components/ChatScreen";
 import VoiceScreen from "@/components/VoiceScreen";
 import SettingsScreen from "@/components/SettingsScreen";
 import AuthScreen from "@/components/AuthScreen";
+import TranslateScreen from "@/components/TranslateScreen";
+import PlacesScreen from "@/components/PlacesScreen";
 import { useAuth } from "@/hooks/useAuth";
 
 type Screen = 'welcome' | 'dashboard' | 'chat' | 'voice' | 'translate' | 'places' | 'settings';
@@ -64,29 +66,9 @@ const Index = () => {
       case 'settings':
         return <SettingsScreen onBack={handleBack} />;
       case 'translate':
-        // Placeholder for translate screen
-        return (
-          <div className="min-h-screen flex items-center justify-center bg-background">
-            <div className="text-center space-y-4">
-              <h1 className="text-2xl font-bold font-inter">Traducteur</h1>
-              <p className="text-muted-foreground font-cairo">مترجم</p>
-              <p className="text-sm text-muted-foreground">Darija ↔ Français</p>
-              <Button onClick={handleBack}>Retour</Button>
-            </div>
-          </div>
-        );
+        return <TranslateScreen onBack={handleBack} />;
       case 'places':
-        // Placeholder for places screen
-        return (
-          <div className="min-h-screen flex items-center justify-center bg-background">
-            <div className="text-center space-y-4">
-              <h1 className="text-2xl font-bold font-inter">Lieux à proximité</h1>
-              <p className="text-muted-foreground font-cairo">أماكن قريبة</p>
-              <p className="text-sm text-muted-foreground">ATB, Poste, Hôpitaux...</p>
-              <Button onClick={handleBack}>Retour</Button>
-            </div>
-          </div>
-        );
+        return <PlacesScreen onBack={handleBack} />;
       default:
         return <WelcomeScreen onStart={handleStart} />;
     }

@@ -1,14 +1,24 @@
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Mic, MessageCircle, MapPin, Sun, Lightbulb } from "lucide-react";
+import { Mic, MessageCircle, MapPin, Sun, Lightbulb, Loader2 } from "lucide-react";
 import { useLanguage, translations } from "@/hooks/useLanguage";
+import { supabase } from "@/integrations/supabase/client";
 
 interface DashboardScreenProps {
   onNavigate: (screen: string) => void;
 }
 
+interface DailyTip {
+  french: string;
+  arabic: string;
+  day: string;
+}
+
 const DashboardScreen = ({ onNavigate }: DashboardScreenProps) => {
   const { language } = useLanguage();
+  const [dailyTip, setDailyTip] = useState<DailyTip | null>(null);
+  const [loadingTip, setLoadingTip] = useState(true);
   const quickActions = [
     {
       icon: MessageCircle,
@@ -43,6 +53,28 @@ const DashboardScreen = ({ onNavigate }: DashboardScreenProps) => {
       action: () => onNavigate('voice')
     }
   ];
+
+  useEffect(() => {
+    const fetchDailyTip = async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke('daily-tip');
+        if (error) throw error;
+        setDailyTip(data.tip);
+      } catch (error) {
+        console.error('Error fetching daily tip:', error);
+        // Fallback tip
+        setDailyTip({
+          french: "Pour dire 'Comment ça va ?' en darija tunisien :",
+          arabic: "كيفاش الصحة؟",
+          day: new Date().toLocaleDateString('fr-FR', { weekday: 'long' })
+        });
+      } finally {
+        setLoadingTip(false);
+      }
+    };
+
+    fetchDailyTip();
+  }, []);
 
   return (
     <div className="min-h-screen p-4 space-y-6 tile-pattern">
@@ -89,16 +121,30 @@ const DashboardScreen = ({ onNavigate }: DashboardScreenProps) => {
         <CardHeader className="pb-3">
           <div className="flex items-center space-x-3">
             <Lightbulb className="w-5 h-5 text-accent-foreground" />
-            <CardTitle className="text-base font-inter">Astuce du jour</CardTitle>
+            <CardTitle className="text-base font-inter">
+              Astuce du jour {dailyTip?.day && `- ${dailyTip.day}`}
+            </CardTitle>
           </div>
         </CardHeader>
         <CardContent>
-          <p className="text-sm font-inter mb-2">
-            Pour dire "Comment ça va ?" en darija tunisien :
-          </p>
-          <p className="font-cairo text-right text-lg font-semibold">
-            "كيفاش الصحة؟" أو "كي راك؟"
-          </p>
+          {loadingTip ? (
+            <div className="flex items-center justify-center py-4">
+              <Loader2 className="w-4 h-4 animate-spin" />
+            </div>
+          ) : dailyTip ? (
+            <>
+              <p className="text-sm font-inter mb-2">
+                {dailyTip.french}
+              </p>
+              <p className="font-cairo text-right text-lg font-semibold">
+                "{dailyTip.arabic}"
+              </p>
+            </>
+          ) : (
+            <p className="text-sm text-center text-muted-foreground">
+              Impossible de charger l'astuce du jour
+            </p>
+          )}
         </CardContent>
       </Card>
 

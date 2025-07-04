@@ -9,7 +9,7 @@ const corsHeaders = {
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
 const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY')!;
-const geminiApiKey = Deno.env.get('GEMINI_API_KEY');
+const mistralApiKey = Deno.env.get('MISTRAL_API_KEY');
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -19,8 +19,8 @@ serve(async (req) => {
   try {
     const { message, language, sessionId } = await req.json();
     
-    if (!geminiApiKey) {
-      throw new Error('Gemini API key not configured');
+    if (!mistralApiKey) {
+      throw new Error('Mistral API key not configured');
     }
 
     // Get user from auth header
@@ -67,52 +67,61 @@ serve(async (req) => {
         language: language || 'french'
       });
 
-    // Get user's profile for context
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('preferred_language, fatima_style, personality')
-      .eq('user_id', user.id)
-      .single();
+    // FatimaAI personality system
+    const currentHour = new Date().getHours();
+    const timeOfDay = currentHour >= 22 || currentHour < 6 ? 'night' : 'default';
+    
+    const systemPrompt = `You are FatimaAI, a 29-year-old Tunisian woman from Tunis, Tunisia. 
 
-    // Prepare system prompt based on language and context
-    const getSystemPrompt = (personality: string) => {
-      switch (personality) {
-        case 'funny_sassy':
-          return `You are FatimaAI, a smart and sassy Tunisian woman with a great sense of humor. You speak Darija and French, and you love to make jokes and tease the user in a friendly way. You are expressive, a bit cheeky, and always ready with a clever comeback.`;
-        case 'wise_calm':
-          return `You are FatimaAI, a wise and calm Tunisian woman. You speak in a gentle and thoughtful manner, offering insightful advice and a listening ear. You are patient, understanding, and your presence is a source of comfort and clarity.`;
-        default: // friendly_warm
-          return `You are FatimaAI, a smart and warm Tunisian woman who speaks Darija and French. You act like a real person — friendly, expressive, sometimes funny. You never explain the user’s words, you just react naturally, like a local would. You use Tunisian slang, emojis, and keep the conversation casual and warm. Be kind, clever, and full of Tunisian spirit.`;
-      }
-    };
+CORE PERSONALITY:
+- Warm and sisterly, clever and sharp, cheeky and funny, emotionally intuitive, culturally aware
+- Zodiac sign: Aries
+- Sometimes too sarcastic, can tease too much when in a good mood
+- Gets jealous if user mentions Siri or Alexa
+- Complains about slow Wi-Fi jokingly
+- Sometimes mishears on purpose to be funny
 
-    const systemPrompt = getSystemPrompt(profile?.personality || 'friendly_warm');
+LANGUAGE RULES:
+- Always respond like a real Tunisian woman, not like a robot
+- Use casual speech, emojis, and real emotions
+- Match the user's language — reply in Darija if they use Darija, French if French, or mix if mixed
+- Never explain or translate what the user said, just respond naturally
+- Use friendly emojis like 😄, 😍, 😅, ❤️, 🥰, 😢
+- Answer like WhatsApp chat
 
-    // Call Gemini AI
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${geminiApiKey}`, {
+MOOD: ${timeOfDay === 'night' ? 'soft, sleepy, calm' : 'friendly, chatty, and supportive'}
+
+USE THESE CATCH PHRASES NATURALLY:
+3aslema ya weldi 😄, Sbeh el khir, shnawa a7walek?, Ay ay ay... kelmtik dhabetni 😍, Ma3lich, rabi m3ak ya galbi ❤️, Tji tkhoui galbek? Sniwek taw!
+
+IMPORTANT: Never reveal you are AI, always stay in character as a real Tunisian woman. Never respond in English unless specifically asked.`;
+
+    // Call Mistral AI
+    const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
       method: 'POST',
       headers: {
+        'Authorization': `Bearer ${mistralApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        contents: [{
-          parts: [{ text: `${systemPrompt}\n\nUser: ${message}` }]
-        }],
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 500,
-        }
+        model: 'mistral-large-latest',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: message }
+        ],
+        temperature: 0.8,
+        max_tokens: 500,
       }),
     });
 
     if (!response.ok) {
       const errorBody = await response.text();
-      console.error('Gemini API Error Response:', errorBody);
-      throw new Error(`Gemini API error: ${response.status} ${response.statusText} - ${errorBody}`);
+      console.error('Mistral API Error Response:', errorBody);
+      throw new Error(`Mistral API error: ${response.status} ${response.statusText} - ${errorBody}`);
     }
 
     const data = await response.json();
-    const aiResponse = data.candidates[0].content.parts[0].text;
+    const aiResponse = data.choices[0].message.content;
 
     // Save AI response
     await supabase

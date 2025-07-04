@@ -79,6 +79,7 @@ export type Database = {
           fatima_style: Json | null
           id: string
           location: Json | null
+          personality: string
           preferred_language: string | null
           updated_at: string
           user_id: string
@@ -90,6 +91,7 @@ export type Database = {
           fatima_style?: Json | null
           id?: string
           location?: Json | null
+          personality?: string
           preferred_language?: string | null
           updated_at?: string
           user_id: string
@@ -101,6 +103,7 @@ export type Database = {
           fatima_style?: Json | null
           id?: string
           location?: Json | null
+          personality?: string
           preferred_language?: string | null
           updated_at?: string
           user_id?: string

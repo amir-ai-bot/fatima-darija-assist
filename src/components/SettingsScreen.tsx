@@ -39,7 +39,7 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
       console.error('Error fetching profile:', error);
     } else if (data) {
       setProfile(data);
-      setLanguage(data.preferred_language || 'french');
+      setLanguage(data.preferred_language as 'darija' | 'french' || 'french');
       setPersonality(data.personality || 'friendly_warm');
     }
   };
