@@ -131,5 +131,29 @@ export const translations = {
   voiceDesc: {
     french: "Parlez avec Fatima",
     darija: "تكلم مع فاطمة"
+  },
+  news: {
+    french: "Actualités",
+    darija: "الأخبار"
+  },
+  newsDesc: {
+    french: "Dernières infos tunisiennes",
+    darija: "آخر أخبار تونس"
+  },
+  readMore: {
+    french: "Lire plus",
+    darija: "اقرأ المزيد"
+  },
+  newsTitle: {
+    french: "Actualités Tunisiennes",
+    darija: "الأخبار التونسية"
+  },
+  refreshNews: {
+    french: "Actualiser",
+    darija: "تحديث"
+  },
+  noNews: {
+    french: "Aucune actualité disponible",
+    darija: "لا توجد أخبار متاحة"
   }
 };

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Mic, MessageCircle, MapPin, Sun, Lightbulb, Loader2, MapPinIcon } from "lucide-react";
+import { Mic, MessageCircle, MapPin, Sun, Lightbulb, Loader2, MapPinIcon, Newspaper } from "lucide-react";
 import { useLanguage, translations } from "@/hooks/useLanguage";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -76,6 +76,13 @@ const DashboardScreen = ({ onNavigate }: DashboardScreenProps) => {
       description: translations.voiceDesc[language],
       color: "bg-gradient-primary",
       action: () => onNavigate('voice')
+    },
+    {
+      icon: Newspaper,
+      title: translations.news[language],
+      description: translations.newsDesc[language],
+      color: "bg-gradient-secondary",
+      action: () => onNavigate('news')
     }
   ];
 
@@ -279,7 +286,7 @@ const DashboardScreen = ({ onNavigate }: DashboardScreenProps) => {
         <h3 className="text-lg font-semibold font-inter text-foreground">
           {translations.quickActions[language]}
         </h3>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-3">
           {quickActions.map((action, index) => (
             <Card 
               key={index}

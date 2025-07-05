@@ -9,9 +9,10 @@ import SettingsScreen from "@/components/SettingsScreen";
 import AuthScreen from "@/components/AuthScreen";
 import TranslateScreen from "@/components/TranslateScreen";
 import PlacesScreen from "@/components/PlacesScreen";
+import NewsScreen from "@/components/NewsScreen";
 import { useAuth } from "@/hooks/useAuth";
 
-type Screen = 'welcome' | 'dashboard' | 'chat' | 'voice' | 'translate' | 'places' | 'settings';
+type Screen = 'welcome' | 'dashboard' | 'chat' | 'voice' | 'translate' | 'places' | 'settings' | 'news';
 
 const Index = () => {
   const { user, loading } = useAuth();
@@ -69,6 +70,8 @@ const Index = () => {
         return <TranslateScreen onBack={handleBack} />;
       case 'places':
         return <PlacesScreen onBack={handleBack} />;
+      case 'news':
+        return <NewsScreen onBack={handleBack} />;
       default:
         return <WelcomeScreen onStart={handleStart} />;
     }
