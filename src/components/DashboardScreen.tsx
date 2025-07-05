@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Mic, MessageCircle, MapPin, Sun, Lightbulb, Loader2 } from "lucide-react";
+import { Mic, MessageCircle, MapPin, Sun, Lightbulb, Loader2, MapPinIcon } from "lucide-react";
 import { useLanguage, translations } from "@/hooks/useLanguage";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -15,49 +15,136 @@ interface DailyTip {
   day: string;
 }
 
+interface WeatherData {
+  location: {
+    name: string;
+    country: string;
+  };
+  current: {
+    temp_c: number;
+    condition: {
+      text: string;
+      icon: string;
+    };
+    humidity: number;
+    wind_kph: number;
+    feelslike_c: number;
+  };
+  forecast: {
+    forecastday: [{
+      day: {
+        maxtemp_c: number;
+        mintemp_c: number;
+      }
+    }]
+  };
+}
+
 const DashboardScreen = ({ onNavigate }: DashboardScreenProps) => {
   const { language } = useLanguage();
   const [dailyTip, setDailyTip] = useState<DailyTip | null>(null);
   const [loadingTip, setLoadingTip] = useState(true);
+  const [weather, setWeather] = useState<WeatherData | null>(null);
+  const [loadingWeather, setLoadingWeather] = useState(true);
+  const [locationEnabled, setLocationEnabled] = useState(false);
+  
   const quickActions = [
     {
       icon: MessageCircle,
-      title: "Traduire",
-      titleArabic: "ترجم",
-      description: "Darija ↔ Français",
+      title: translations.translate[language],
+      description: translations.translateDesc[language],
       color: "bg-gradient-primary",
       action: () => onNavigate('translate')
     },
     {
       icon: MessageCircle,
-      title: "Poser une question",
-      titleArabic: "اسأل سؤال",
-      description: "Chat avec Fatima",
+      title: translations.askQuestion[language],
+      description: translations.chatDesc[language],
       color: "bg-gradient-secondary",
       action: () => onNavigate('chat')
     },
     {
       icon: MapPin,
-      title: "Trouver un lieu",
-      titleArabic: "البحث عن مكان",
-      description: "ATB, Poste, Hôpital...",
+      title: translations.findPlace[language],
+      description: translations.placesDesc[language],
       color: "bg-gradient-accent",
       action: () => onNavigate('places')
     },
     {
       icon: Mic,
-      title: "Assistant vocal",
-      titleArabic: "مساعد صوتي",
-      description: "Parlez avec Fatima",
+      title: translations.voiceAssistant[language],
+      description: translations.voiceDesc[language],
       color: "bg-gradient-primary",
       action: () => onNavigate('voice')
     }
   ];
 
+  const translateWeatherCondition = (condition: string) => {
+    const conditionLower = condition.toLowerCase();
+    if (conditionLower.includes('sun') || conditionLower.includes('clear')) {
+      return translations.sunny[language];
+    } else if (conditionLower.includes('cloud')) {
+      return translations.cloudy[language];
+    } else if (conditionLower.includes('rain') || conditionLower.includes('drizzle')) {
+      return translations.rainy[language];
+    }
+    return condition;
+  };
+
+  const getLocationAndWeather = async () => {
+    if (!navigator.geolocation) {
+      setLoadingWeather(false);
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        setLocationEnabled(true);
+        try {
+          const { data, error } = await supabase.functions.invoke('get-weather', {
+            body: {
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude
+            }
+          });
+          
+          if (error) throw error;
+          setWeather(data);
+        } catch (error) {
+          console.error('Error fetching weather:', error);
+          // Fallback weather for Tunis
+          setWeather({
+            location: { name: "Tunis", country: "TN" },
+            current: {
+              temp_c: 24,
+              condition: { text: "Ensoleillé", icon: "☀️" },
+              humidity: 65,
+              wind_kph: 12,
+              feelslike_c: 26
+            },
+            forecast: {
+              forecastday: [{
+                day: { maxtemp_c: 28, mintemp_c: 18 }
+              }]
+            }
+          });
+        } finally {
+          setLoadingWeather(false);
+        }
+      },
+      (error) => {
+        console.error('Geolocation error:', error);
+        setLoadingWeather(false);
+      }
+    );
+  };
+
   useEffect(() => {
     const fetchDailyTip = async () => {
       try {
-        const { data, error } = await supabase.functions.invoke('daily-tip');
+        const { data, error } = await supabase.functions.invoke('daily-tip', {
+          body: { language }
+        });
         if (error) throw error;
         setDailyTip(data.tip);
       } catch (error) {
@@ -66,7 +153,7 @@ const DashboardScreen = ({ onNavigate }: DashboardScreenProps) => {
         setDailyTip({
           french: "Pour dire 'Comment ça va ?' en darija tunisien :",
           arabic: "كيفاش الصحة؟",
-          day: new Date().toLocaleDateString('fr-FR', { weekday: 'long' })
+          day: new Date().toLocaleDateString(language === 'french' ? 'fr-FR' : 'ar-TN', { weekday: 'long' })
         });
       } finally {
         setLoadingTip(false);
@@ -74,7 +161,8 @@ const DashboardScreen = ({ onNavigate }: DashboardScreenProps) => {
     };
 
     fetchDailyTip();
-  }, []);
+    getLocationAndWeather();
+  }, [language]);
 
   return (
     <div className="min-h-screen p-4 space-y-6 tile-pattern">
@@ -96,23 +184,57 @@ const DashboardScreen = ({ onNavigate }: DashboardScreenProps) => {
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-lg font-inter">Tunis</CardTitle>
-              <CardDescription className="font-cairo">تونس العاصمة</CardDescription>
+              <CardTitle className="text-lg font-inter">
+                {loadingWeather ? translations.loading[language] : (
+                  language === 'darija' 
+                    ? `${translations.todayWeather[language]} ${weather?.location.name || 'تونس'}`
+                    : `${weather?.location.name || 'Tunis'}`
+                )}
+              </CardTitle>
+              {!loadingWeather && weather && (
+                <CardDescription className="font-cairo">
+                  {language === 'darija' ? weather.location.name : ''}
+                </CardDescription>
+              )}
             </div>
-            <Sun className="w-8 h-8 text-primary" />
+            {!locationEnabled ? (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={getLocationAndWeather}
+                className="flex items-center gap-2"
+              >
+                <MapPinIcon className="w-4 h-4" />
+                {translations.enableLocation[language]}
+              </Button>
+            ) : (
+              <Sun className="w-8 h-8 text-primary" />
+            )}
           </div>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-2xl font-bold">24°C</p>
-              <p className="text-sm text-muted-foreground">Ensoleillé</p>
+          {loadingWeather ? (
+            <div className="flex items-center justify-center py-4">
+              <Loader2 className="w-4 h-4 animate-spin" />
             </div>
-            <div className="text-right text-sm text-muted-foreground">
-              <p>Min: 18°C</p>
-              <p>Max: 28°C</p>
+          ) : weather ? (
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-2xl font-bold">{weather.current.temp_c}°C</p>
+                <p className="text-sm text-muted-foreground">
+                  {translateWeatherCondition(weather.current.condition.text)}
+                </p>
+              </div>
+              <div className="text-right text-sm text-muted-foreground">
+                <p>{translations.min[language]}: {weather.forecast.forecastday[0].day.mintemp_c}°C</p>
+                <p>{translations.max[language]}: {weather.forecast.forecastday[0].day.maxtemp_c}°C</p>
+              </div>
             </div>
-          </div>
+          ) : (
+            <p className="text-center text-muted-foreground">
+              {translations.enableLocation[language]}
+            </p>
+          )}
         </CardContent>
       </Card>
 
@@ -122,7 +244,7 @@ const DashboardScreen = ({ onNavigate }: DashboardScreenProps) => {
           <div className="flex items-center space-x-3">
             <Lightbulb className="w-5 h-5 text-accent-foreground" />
             <CardTitle className="text-base font-inter">
-              Astuce du jour {dailyTip?.day && `- ${dailyTip.day}`}
+              {translations.dailyTip[language]} {dailyTip?.day && `- ${dailyTip.day}`}
             </CardTitle>
           </div>
         </CardHeader>
@@ -132,17 +254,21 @@ const DashboardScreen = ({ onNavigate }: DashboardScreenProps) => {
               <Loader2 className="w-4 h-4 animate-spin" />
             </div>
           ) : dailyTip ? (
-            <>
-              <p className="text-sm font-inter mb-2">
-                {dailyTip.french}
-              </p>
+            language === 'darija' ? (
               <p className="font-cairo text-right text-lg font-semibold">
                 "{dailyTip.arabic}"
               </p>
-            </>
+            ) : (
+              <p className="text-sm font-inter">
+                {dailyTip.french}
+              </p>
+            )
           ) : (
             <p className="text-sm text-center text-muted-foreground">
-              Impossible de charger l'astuce du jour
+              {language === 'darija' 
+                ? "تعذر تحميل النصيحة اليومية"
+                : "Impossible de charger l'astuce du jour"
+              }
             </p>
           )}
         </CardContent>
@@ -151,7 +277,7 @@ const DashboardScreen = ({ onNavigate }: DashboardScreenProps) => {
       {/* Quick Actions */}
       <div className="space-y-4">
         <h3 className="text-lg font-semibold font-inter text-foreground">
-          Actions rapides
+          {translations.quickActions[language]}
         </h3>
         <div className="grid grid-cols-2 gap-4">
           {quickActions.map((action, index) => (
@@ -166,7 +292,6 @@ const DashboardScreen = ({ onNavigate }: DashboardScreenProps) => {
                 </div>
                 <div>
                   <h4 className="font-semibold text-sm font-inter">{action.title}</h4>
-                  <p className="text-xs font-cairo text-right">{action.titleArabic}</p>
                   <p className="text-xs text-muted-foreground mt-1 font-inter">
                     {action.description}
                   </p>
@@ -180,7 +305,7 @@ const DashboardScreen = ({ onNavigate }: DashboardScreenProps) => {
       {/* Footer */}
       <div className="text-center pt-8 pb-4">
         <p className="text-xs text-muted-foreground font-inter">
-          Fait avec Yassin_Dev pour la Tunisie 🇹🇳
+          {translations.madeWithLove[language]}
         </p>
       </div>
     </div>

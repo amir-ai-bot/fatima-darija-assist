@@ -63,5 +63,73 @@ export const translations = {
   back: {
     french: "← Retour",
     darija: "← رجوع"
+  },
+  dailyTip: {
+    french: "Astuce du jour",
+    darija: "نصيحة اليوم"
+  },
+  sunny: {
+    french: "Ensoleillé",
+    darija: "مشمس"
+  },
+  cloudy: {
+    french: "Nuageux",
+    darija: "غايم"
+  },
+  rainy: {
+    french: "Pluvieux", 
+    darija: "شتوي"
+  },
+  hot: {
+    french: "Chaud",
+    darija: "سخون"
+  },
+  cold: {
+    french: "Froid",
+    darija: "بارد"
+  },
+  weather: {
+    french: "Météo",
+    darija: "الطقس"
+  },
+  todayWeather: {
+    french: "Aujourd'hui à",
+    darija: "اليوم في"
+  },
+  min: {
+    french: "Min",
+    darija: "أدنى"
+  },
+  max: {
+    french: "Max", 
+    darija: "أعلى"
+  },
+  loading: {
+    french: "Chargement...",
+    darija: "جاري التحميل..."
+  },
+  enableLocation: {
+    french: "Activer la localisation",
+    darija: "تفعيل الموقع"
+  },
+  madeWithLove: {
+    french: "Fait avec Yassin_Dev pour la Tunisie 🇹🇳",
+    darija: "صنع بحب مع ياسين للبلاد التونسية 🇹🇳"
+  },
+  translateDesc: {
+    french: "Darija ↔ Français",
+    darija: "الدارجة ↔ الفرنسية"
+  },
+  chatDesc: {
+    french: "Chat avec Fatima",
+    darija: "تكلم مع فاطمة"
+  },
+  placesDesc: {
+    french: "ATB, Poste, Hôpital...",
+    darija: "النقل، البريد، السبيطار..."
+  },
+  voiceDesc: {
+    french: "Parlez avec Fatima",
+    darija: "تكلم مع فاطمة"
   }
 };

@@ -61,6 +61,7 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
   const updateLanguage = (newLanguage: 'darija' | 'french') => {
     setLanguage(newLanguage);
     localStorage.setItem('app-language', newLanguage);
+    updateProfile({ preferred_language: newLanguage });
     // Trigger a custom event to notify other components
     window.dispatchEvent(new CustomEvent('languageChanged', { detail: newLanguage }));
   };
@@ -71,8 +72,7 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
   };
 
   const handleLanguageChange = (newLanguage: 'darija' | 'french') => {
-    setLanguage(newLanguage);
-    updateProfile({ preferred_language: newLanguage });
+    updateLanguage(newLanguage);
   };
 
   const handlePersonalityChange = (newPersonality: string) => {
