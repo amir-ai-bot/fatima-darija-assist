@@ -8,6 +8,12 @@ export const useLanguage = () => {
     return (saved as Language) || 'french';
   });
 
+  const changeLanguage = (newLanguage: Language) => {
+    setLanguage(newLanguage);
+    localStorage.setItem('app-language', newLanguage);
+    window.dispatchEvent(new CustomEvent('languageChanged', { detail: newLanguage }));
+  };
+
   useEffect(() => {
     const handleLanguageChange = (event: CustomEvent) => {
       setLanguage(event.detail);
@@ -20,7 +26,7 @@ export const useLanguage = () => {
     };
   }, []);
 
-  return { language };
+  return { language, setLanguage: changeLanguage };
 };
 
 export const translations = {
@@ -363,5 +369,61 @@ export const translations = {
   online: {
     french: "En ligne",
     darija: "متصل"
+  },
+  verifyEmail: {
+    french: "Vérifiez votre email",
+    darija: "تحقق من بريدك الإلكتروني"
+  },
+  welcomeBack: {
+    french: "Bon retour !",
+    darija: "أهلا وسهلا بعودتك"
+  },
+  verifyEmailDesc: {
+    french: "Nous avons envoyé un lien de vérification à votre email.",
+    darija: "أرسلنا رابط التحقق إلى بريدك الإلكتروني."
+  },
+  createAccount: {
+    french: "Créer un compte",
+    darija: "إنشاء حساب"
+  },
+  loginToAccount: {
+    french: "Se connecter",
+    darija: "تسجيل الدخول"
+  },
+  clickLink: {
+    french: "Cliquez sur le lien pour vérifier votre compte.",
+    darija: "اضغط على الرابط للتحقق من حسابك."
+  },
+  verified: {
+    french: "Vérifié !",
+    darija: "تم التحقق!"
+  },
+  fullName: {
+    french: "Nom complet",
+    darija: "الاسم الكامل"
+  },
+  yourName: {
+    french: "Votre nom",
+    darija: "اسمك"
+  },
+  emailPlaceholder: {
+    french: "votre@email.com",
+    darija: "بريدك@الإلكتروني.com"
+  },
+  facebookButton: {
+    french: "Continuer avec Facebook",
+    darija: "المتابعة باستخدام فيسبوك"
+  },
+  alreadyHaveAccount: {
+    french: "Vous avez déjà un compte ?",
+    darija: "هل لديك حساب؟"
+  },
+  noAccount: {
+    french: "Pas de compte ?",
+    darija: "ليس لديك حساب؟"
+  },
+  examples: {
+    french: "Exemples",
+    darija: "أمثلة"
   }
 };

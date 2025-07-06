@@ -104,6 +104,12 @@ const DashboardScreen = ({ onNavigate }: DashboardScreenProps) => {
       return;
     }
 
+    const options = {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 300000 // 5 minutes
+    };
+
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         setLocationEnabled(true);
@@ -141,8 +147,25 @@ const DashboardScreen = ({ onNavigate }: DashboardScreenProps) => {
       },
       (error) => {
         console.error('Geolocation error:', error);
+        // Show fallback weather on location error
+        setWeather({
+          location: { name: "Tunis", country: "TN" },
+          current: {
+            temp_c: 24,
+            condition: { text: "Ensoleillé", icon: "☀️" },
+            humidity: 65,
+            wind_kph: 12,
+            feelslike_c: 26
+          },
+          forecast: {
+            forecastday: [{
+              day: { maxtemp_c: 28, mintemp_c: 18 }
+            }]
+          }
+        });
         setLoadingWeather(false);
-      }
+      },
+      options
     );
   };
 

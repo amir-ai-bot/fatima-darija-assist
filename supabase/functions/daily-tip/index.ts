@@ -25,44 +25,44 @@ serve(async (req) => {
     const dayOfMonth = today.getDate();
 
     const systemPrompt = language === 'darija' 
-      ? `أنت فاطمة الذكية، مساعدة تونسية مفيدة. اعطي نصيحة يومية لتعلم اللهجة التونسية (الدارجة). النصيحة يجب أن تكون:
+      ? `أنت فاطمة الذكية، مساعدة تونسية مفيدة. اعطي نصيحة يومية إسلامية أو تونسية تراثية. النصيحة يجب أن تكون:
       
-      1. تعليمية ومفيدة
-      2. عن اللهجة التونسية (الدارجة التونسية)
+      1. إسلامية أو من التراث التونسي
+      2. مفيدة للحياة اليومية
       3. باللغة العربية فقط
-      4. ذات صلة بالثقافة التونسية
+      4. قصيرة ومؤثرة
       5. تتغير حسب اليوم: اليوم ${dayOfWeek}، يوم ${dayOfMonth} من الشهر
       
-      اعط النصيحة بالعربية فقط مع أمثلة بالدارجة التونسية.
+      اعط نصيحة واحدة فقط بالعربية.
       
       ركز على جوانب مختلفة:
-      - التحايا (الاثنين)
-      - التعابير الغذائية (الثلاثاء)
-      - مصطلحات العائلة (الأربعاء)
-      - تعابير الوقت (الخميس)
-      - المشاعر (الجمعة)
-      - الطقس (السبت)
-      - الأمثال الشعبية (الأحد)`
-      : `You are FatimaAI, a helpful Tunisian assistant. Generate a daily tip about Tunisian Darija language learning. The tip should be:
+      - أحاديث نبوية (الاثنين)
+      - أمثال تونسية (الثلاثاء)
+      - حكم وأقوال (الأربعاء)
+      - آيات قرآنية (الخميس)
+      - أدعية (الجمعة)
+      - تراث تونسي (السبت)
+      - نصائح للحياة (الأحد)`
+      : `You are FatimaAI, a helpful Tunisian assistant. Generate a daily Islamic or Tunisian cultural tip. The tip should be:
       
-      1. Educational and practical
-      2. About Tunisian Darija (Tunisian Arabic dialect)
-      3. Include both the phrase in Arabic and French translation
+      1. Islamic wisdom or Tunisian cultural heritage
+      2. Practical for daily life
+      3. Include both Arabic and French versions
       4. Be culturally relevant to Tunisia
       5. Change based on the day: Today is ${dayOfWeek}, day ${dayOfMonth} of the month
       
       Format your response as:
       French explanation (1-2 sentences)
-      Arabic phrase in quotes
+      Arabic wisdom/saying in quotes
       
-      Make it different each day by focusing on different aspects like:
-      - Greetings (Monday)
-      - Food expressions (Tuesday) 
-      - Family terms (Wednesday)
-      - Time expressions (Thursday)
-      - Emotions (Friday)
-      - Weather (Saturday)
-      - Common sayings (Sunday)`;
+      Focus on different aspects each day:
+      - Islamic teachings (Monday)
+      - Tunisian proverbs (Tuesday) 
+      - Life wisdom (Wednesday)
+      - Quranic verses (Thursday)
+      - Islamic prayers/duas (Friday)
+      - Tunisian heritage (Saturday)
+      - Life advice (Sunday)`;
 
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${geminiApiKey}`, {
       method: 'POST',
@@ -125,9 +125,9 @@ serve(async (req) => {
     
     // Fallback tip
     const fallbackTips = [
-      { french: "Pour dire 'Bonjour' en darija tunisien :", arabic: "أهلا وسهلا" },
-      { french: "Pour dire 'Comment ça va ?' en darija :", arabic: "كيفاش الصحة؟" },
-      { french: "Pour dire 'Merci beaucoup' :", arabic: "بارك الله فيك" },
+      { french: "La patience est une clé vers le succès", arabic: "الصبر مفتاح الفرج" },
+      { french: "Commencez votre journée par la prière", arabic: "ابدأ يومك بالصلاة والدعاء" },
+      { french: "Honorer ses parents apporte les bénédictions", arabic: "بر الوالدين جنة في الدنيا" },
     ];
     
     const randomTip = fallbackTips[Math.floor(Math.random() * fallbackTips.length)];
