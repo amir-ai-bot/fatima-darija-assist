@@ -19,16 +19,17 @@ interface Message {
 
 interface ChatScreenProps {
   onBack: () => void;
+  initialSessionId?: string;
 }
 
-const ChatScreen = ({ onBack }: ChatScreenProps) => {
+const ChatScreen = ({ onBack, initialSessionId }: ChatScreenProps) => {
   const { language } = useLanguage();
   const { user } = useAuth();
   const { toast } = useToast();
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [sessionId, setSessionId] = useState<string | null>(initialSessionId || null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {

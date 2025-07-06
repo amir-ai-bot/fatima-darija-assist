@@ -10,13 +10,17 @@ import AuthScreen from "@/components/AuthScreen";
 import TranslateScreen from "@/components/TranslateScreen";
 import PlacesScreen from "@/components/PlacesScreen";
 import NewsScreen from "@/components/NewsScreen";
+import ChatHistoryScreen from "@/components/ChatHistoryScreen";
+import ProfileEditScreen from "@/components/ProfileEditScreen";
+import SubscriptionScreen from "@/components/SubscriptionScreen";
 import { useAuth } from "@/hooks/useAuth";
 
-type Screen = 'welcome' | 'dashboard' | 'chat' | 'voice' | 'translate' | 'places' | 'settings' | 'news';
+type Screen = 'welcome' | 'dashboard' | 'chat' | 'voice' | 'translate' | 'places' | 'settings' | 'news' | 'history' | 'profile' | 'subscription';
 
 const Index = () => {
   const { user, loading } = useAuth();
   const [currentScreen, setCurrentScreen] = useState<Screen>('welcome');
+  const [selectedSessionId, setSelectedSessionId] = useState<string | undefined>();
 
   const navigateToScreen = (screen: Screen) => {
     setCurrentScreen(screen);
@@ -61,7 +65,7 @@ const Index = () => {
           </div>
         );
       case 'chat':
-        return <ChatScreen onBack={handleBack} />;
+        return <ChatScreen onBack={handleBack} initialSessionId={selectedSessionId} />;
       case 'voice':
         return <VoiceScreen onBack={handleBack} />;
       case 'settings':
@@ -72,6 +76,15 @@ const Index = () => {
         return <PlacesScreen onBack={handleBack} />;
       case 'news':
         return <NewsScreen onBack={handleBack} />;
+      case 'history':
+        return <ChatHistoryScreen onBack={handleBack} onSelectSession={(sessionId) => {
+          setSelectedSessionId(sessionId);
+          setCurrentScreen('chat');
+        }} />;
+      case 'profile':
+        return <ProfileEditScreen onBack={handleBack} />;
+      case 'subscription':
+        return <SubscriptionScreen onBack={handleBack} />;
       default:
         return <WelcomeScreen onStart={handleStart} />;
     }

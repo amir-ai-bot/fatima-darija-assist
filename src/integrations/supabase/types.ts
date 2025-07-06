@@ -75,6 +75,7 @@ export type Database = {
         Row: {
           avatar_url: string | null
           created_at: string
+          description: string | null
           display_name: string | null
           fatima_style: Json | null
           id: string
@@ -87,6 +88,7 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           created_at?: string
+          description?: string | null
           display_name?: string | null
           fatima_style?: Json | null
           id?: string
@@ -99,6 +101,7 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           created_at?: string
+          description?: string | null
           display_name?: string | null
           fatima_style?: Json | null
           id?: string
@@ -107,6 +110,42 @@ export type Database = {
           preferred_language?: string | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      subscribers: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          stripe_customer_id: string | null
+          subscribed: boolean
+          subscription_end: string | null
+          subscription_tier: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          stripe_customer_id?: string | null
+          subscribed?: boolean
+          subscription_end?: string | null
+          subscription_tier?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          stripe_customer_id?: string | null
+          subscribed?: boolean
+          subscription_end?: string | null
+          subscription_tier?: string | null
+          updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }

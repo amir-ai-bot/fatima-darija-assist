@@ -425,5 +425,17 @@ export const translations = {
   examples: {
     french: "Exemples",
     darija: "أمثلة"
+  },
+  history: {
+    french: "Historique",
+    darija: "التاريخ"
+  },
+  profileEdit: {
+    french: "Modifier le profil",
+    darija: "تعديل الملف الشخصي"
+  },
+  subscription: {
+    french: "Abonnement",
+    darija: "الاشتراك"
   }
 };

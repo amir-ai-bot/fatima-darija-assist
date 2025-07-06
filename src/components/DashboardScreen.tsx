@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Mic, MessageCircle, MapPin, Sun, Lightbulb, Loader2, MapPinIcon, Newspaper } from "lucide-react";
+import { Mic, MessageCircle, MapPin, Sun, Lightbulb, Loader2, MapPinIcon, Newspaper, History, User, Crown, Menu } from "lucide-react";
 import { useLanguage, translations } from "@/hooks/useLanguage";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -83,6 +83,30 @@ const DashboardScreen = ({ onNavigate }: DashboardScreenProps) => {
       description: translations.newsDesc[language],
       color: "bg-gradient-secondary",
       action: () => onNavigate('news')
+    }
+  ];
+
+  const extraFeatures = [
+    {
+      icon: History,
+      title: translations.history[language],
+      description: language === 'french' ? 'Vos conversations' : 'محادثاتك',
+      color: "bg-gradient-accent",
+      action: () => onNavigate('history')
+    },
+    {
+      icon: User,
+      title: translations.profileEdit[language],
+      description: language === 'french' ? 'Modifier profil' : 'تعديل الملف',
+      color: "bg-gradient-primary",
+      action: () => onNavigate('profile')
+    },
+    {
+      icon: Crown,
+      title: translations.subscription[language],
+      description: language === 'french' ? 'Plans premium' : 'الخطط المميزة',
+      color: "bg-gradient-secondary",
+      action: () => onNavigate('subscription')
     }
   ];
 
@@ -324,6 +348,34 @@ const DashboardScreen = ({ onNavigate }: DashboardScreenProps) => {
                   <h4 className="font-semibold text-sm font-inter">{action.title}</h4>
                   <p className="text-xs text-muted-foreground mt-1 font-inter">
                     {action.description}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+
+      {/* Extra Features */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold font-inter text-foreground">
+          {language === 'french' ? 'Plus de fonctionnalités' : 'المزيد من الميزات'}
+        </h3>
+        <div className="grid grid-cols-1 gap-3">
+          {extraFeatures.map((feature, index) => (
+            <Card 
+              key={index}
+              className="cursor-pointer transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+              onClick={feature.action}
+            >
+              <CardContent className="p-4 flex items-center space-x-4">
+                <div className={`w-12 h-12 rounded-2xl ${feature.color} flex items-center justify-center shadow-medium`}>
+                  <feature.icon className="w-6 h-6 text-white" />
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-semibold text-sm font-inter">{feature.title}</h4>
+                  <p className="text-xs text-muted-foreground mt-1 font-inter">
+                    {feature.description}
                   </p>
                 </div>
               </CardContent>
