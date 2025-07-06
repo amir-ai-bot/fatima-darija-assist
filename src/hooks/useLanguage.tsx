@@ -113,8 +113,8 @@ export const translations = {
     darija: "تفعيل الموقع"
   },
   madeWithLove: {
-    french: "Fait avec Yassin_Dev pour la Tunisie 🇹🇳",
-    darija: "صنع بحب مع ياسين للبلاد التونسية 🇹🇳"
+    french: "Fait avec Yassin_Dev pour la Tunisie",
+    darija: "صنع Yassin_Dev للبلاد التونسية 🇹🇳"
   },
   translateDesc: {
     french: "Darija ↔ Français",
@@ -155,5 +155,213 @@ export const translations = {
   noNews: {
     french: "Aucune actualité disponible",
     darija: "لا توجد أخبار متاحة"
+  },
+  close: {
+    french: "Fermer",
+    darija: "إغلاق"
+  },
+  placesTitle: {
+    french: "Lieux à proximité",
+    darija: "أماكن قريبة"
+  },
+  searchPlaceholder: {
+    french: "Rechercher un lieu...",
+    darija: "ابحث عن مكان..."
+  },
+  frequentSearches: {
+    french: "Recherches fréquentes",
+    darija: "عمليات البحث المتكررة"
+  },
+  results: {
+    french: "Résultats",
+    darija: "النتائج"
+  },
+  noResults: {
+    french: "Aucun résultat",
+    darija: "لا توجد نتائج"
+  },
+  noResultsDesc: {
+    french: "Aucun lieu trouvé pour cette recherche",
+    darija: "لم يتم العثور على مكان لهذا البحث"
+  },
+  tryAnotherSearch: {
+    french: "Essayez une autre recherche",
+    darija: "جرب بحثًا آخر"
+  },
+  locationError: {
+    french: "Erreur de localisation",
+    darija: "خطأ في تحديد الموقع"
+  },
+  locationErrorDesc: {
+    french: "Impossible d'obtenir votre position",
+    darija: "تعذر الحصول على موقعك"
+  },
+  locationSuccess: {
+    french: "Position obtenue",
+    darija: "تم الحصول على الموقع"
+  },
+  locationSuccessDesc: {
+    french: "Recherche des lieux à proximité...",
+    darija: "جاري البحث عن الأماكن القريبة..."
+  },
+  settings: {
+    french: "Paramètres",
+    darija: "إعدادات"
+  },
+  user: {
+    french: "Utilisateur",
+    darija: "المستخدم"
+  },
+  editProfile: {
+    french: "Modifier le profil",
+    darija: "تعديل الملف الشخصي"
+  },
+  appearance: {
+    french: "Apparence",
+    darija: "المظهر"
+  },
+  darkMode: {
+    french: "Mode sombre",
+    darija: "الوضع الليلي"
+  },
+  language: {
+    french: "Langue",
+    darija: "اللغة"
+  },
+  languageName: {
+    french: "Français",
+    darija: "الدارجة التونسية"
+  },
+  languageDesc: {
+    french: "French / Français",
+    darija: "Tunisian Darija"
+  },
+  personality: {
+    french: "Personnalité de Fatima",
+    darija: "شخصية فاطمة"
+  },
+  personalityPlaceholder: {
+    french: "Choisissez une personnalité",
+    darija: "اختر شخصية"
+  },
+  friendly: {
+    french: "Amicale et chaleureuse",
+    darija: "ودودة ودافئة"
+  },
+  funny: {
+    french: "Drôle et taquine",
+    darija: "مضحكة ومرحة"
+  },
+  wise: {
+    french: "Sage et calme",
+    darija: "حكيمة وهادئة"
+  },
+  about: {
+    french: "À propos",
+    darija: "حول التطبيق"
+  },
+  aboutDesc: {
+    french: "Assistant personnel tunisien",
+    darija: "مساعد شخصي تونسي"
+  },
+  features: {
+    french: "🎤 Reconnaissance vocale en darija et français\n💬 Chat intelligent bilingue\n🔄 Traduction darija ↔ français\n📍 Informations locales tunisiennes",
+    darija: "🎤 التعرف على الصوت بالدارجة والفرنسية\n💬 محادثة ذكية ثنائية اللغة\n🔄 ترجمة من الدارجة إلى الفرنسية والعكس\n📍 معلومات محلية تونسية"
+  },
+  madeWithLoveFooter: {
+    french: "Fait avec Yassin_Dev pour la Tunisie",
+    darija: "صنع Yassin_Dev للبلاد التونسية 🇹🇳"
+  },
+  authTitle: {
+    french: "Bienvenue à FatimaAI",
+    darija: "مرحباً بك في فاطمة"
+  },
+  authSubtitle: {
+    french: "Votre assistante personnelle tunisienne",
+    darija: "مساعدتك الشخصية التونسية"
+  },
+  emailLabel: {
+    french: "Adresse e-mail",
+    darija: "البريد الإلكتروني"
+  },
+  passwordLabel: {
+    french: "Mot de passe",
+    darija: "كلمة المرور"
+  },
+  loginButton: {
+    french: "Se connecter",
+    darija: "تسجيل الدخول"
+  },
+  signupButton: {
+    french: "S'inscrire",
+    darija: "تسجيل"
+  },
+  or: {
+    french: "OU",
+    darija: "أو"
+  },
+  googleButton: {
+    french: "Continuer avec Google",
+    darija: "المتابعة باستخدام جوجل"
+  },
+  chatTitle: {
+    french: "Chat avec Fatima",
+    darija: "تكلم مع فاطمة"
+  },
+  chatPlaceholder: {
+    french: "Posez votre question...",
+    darija: "اسأل سؤالك..."
+  },
+  voiceTitle: {
+    french: "Assistant Vocal",
+    darija: "المساعد الصوتي"
+  },
+  voiceStatus: {
+    french: "Appuyez et parlez",
+    darija: "اضغط وتحدث"
+  },
+  voiceListening: {
+    french: "Je vous écoute...",
+    darija: "أنا أستمع..."
+  },
+  voiceThinking: {
+    french: "Je réfléchis...",
+    darija: "أفكر..."
+  },
+  translateTitle: {
+    french: "Traduction",
+    darija: "الترجمة"
+  },
+  translateFrom: {
+    french: "Traduire de",
+    darija: "ترجمة من"
+  },
+  translateTo: {
+    french: "Traduire vers",
+    darija: "ترجمة إلى"
+  },
+  translatePlaceholder: {
+    french: "Entrez votre texte...",
+    darija: "أدخل النص الخاص بك..."
+  },
+  translateButton: {
+    french: "Traduire",
+    darija: "ترجم"
+  },
+  youSaid: {
+    french: "Vous avez dit :",
+    darija: "قلت:"
+  },
+  fatimaResponds: {
+    french: "Fatima répond :",
+    darija: "فاطمة تجيب:"
+  },
+  sampleQuestions: {
+    french: "Exemples de questions :",
+    darija: "أمثلة على الأسئلة:"
+  },
+  online: {
+    french: "En ligne",
+    darija: "متصل"
   }
 };

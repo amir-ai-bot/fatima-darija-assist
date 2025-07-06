@@ -21,7 +21,7 @@ serve(async (req) => {
     // Using OpenWeatherMap API (free tier)
     // You can replace this with any weather API
     const weatherResponse = await fetch(
-      `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=demo_key&units=metric&lang=fr`
+      `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${Deno.env.get("OPENWEATHER_API_KEY")}&units=metric&lang=fr`
     );
 
     // For demo purposes, return mock data if API fails

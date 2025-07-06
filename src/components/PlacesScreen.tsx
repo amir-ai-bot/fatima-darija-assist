@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { MapPin, Search, Navigation, Phone, Clock } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { useLanguage, translations } from "@/hooks/useLanguage";
 
 interface Place {
   id: string;
@@ -20,21 +21,21 @@ interface PlacesScreenProps {
 }
 
 const PlacesScreen = ({ onBack }: PlacesScreenProps) => {
+  const { language } = useLanguage();
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
   const [places, setPlaces] = useState<Place[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Predefined common places in Tunisia
   const commonPlaces = [
-    { icon: "🏦", name: "ATB", type: "Banque", query: "ATB banque" },
-    { icon: "📮", name: "Poste", type: "Services", query: "bureau de poste" },
-    { icon: "🏥", name: "Hôpital", type: "Santé", query: "hôpital" },
-    { icon: "⛽", name: "Station", type: "Carburant", query: "station essence" },
-    { icon: "🍞", name: "Boulangerie", type: "Commerce", query: "boulangerie" },
-    { icon: "🛒", name: "Supermarché", type: "Commerce", query: "supermarché" },
-    { icon: "💊", name: "Pharmacie", type: "Santé", query: "pharmacie" },
-    { icon: "🚕", name: "Taxi", type: "Transport", query: "station taxi" }
+    { icon: "🏦", name: language === 'darija' ? "بانكة" : "Banque", query: "banque" },
+    { icon: "📮", name: language === 'darija' ? "بوستة" : "Poste", query: "bureau de poste" },
+    { icon: "🏥", name: language === 'darija' ? "سبيطار" : "Hôpital", query: "hôpital" },
+    { icon: "⛽", name: language === 'darija' ? "كيوسك" : "Station", query: "station essence" },
+    { icon: "🍞", name: language === 'darija' ? "كوشة" : "Boulangerie", query: "boulangerie" },
+    { icon: "🛒", name: language === 'darija' ? "عطار" : "Supermarché", query: "supermarché" },
+    { icon: "💊", name: language === 'darija' ? "فرماسيا" : "Pharmacie", query: "pharmacie" },
+    { icon: "🚕", name: language === 'darija' ? "تاكسي" : "Taxi", query: "station taxi" }
   ];
 
   const mockPlaces: Place[] = [
@@ -48,7 +49,7 @@ const PlacesScreen = ({ onBack }: PlacesScreenProps) => {
       distance: '0.5 km'
     },
     {
-      id: '2', 
+      id: '2',
       name: 'Poste Centrale',
       type: 'Services',
       address: 'Rue Charles de Gaulle, Centre Ville',
@@ -73,10 +74,9 @@ const PlacesScreen = ({ onBack }: PlacesScreenProps) => {
 
     setIsLoading(true);
     try {
-      // Simulate API call with mock data
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      const filtered = mockPlaces.filter(place => 
+      const filtered = mockPlaces.filter(place =>
         place.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         place.type.toLowerCase().includes(searchTerm.toLowerCase())
       );
@@ -85,14 +85,14 @@ const PlacesScreen = ({ onBack }: PlacesScreenProps) => {
       
       if (filtered.length === 0) {
         toast({
-          title: "Aucun résultat",
-          description: "Aucun lieu trouvé pour cette recherche",
+          title: translations.noResults[language],
+          description: translations.noResultsDesc[language],
         });
       }
     } catch (error) {
       toast({
-        title: "Erreur",
-        description: "Impossible de rechercher les lieux",
+        title: translations.locationError[language],
+        description: translations.locationErrorDesc[language],
         variant: "destructive",
       });
     } finally {
@@ -105,15 +105,15 @@ const PlacesScreen = ({ onBack }: PlacesScreenProps) => {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           toast({
-            title: "Position obtenue",
-            description: "Recherche des lieux à proximité...",
+            title: translations.locationSuccess[language],
+            description: translations.locationSuccessDesc[language],
           });
-          handleSearch("pharmacie"); // Demo search
+          handleSearch("pharmacie");
         },
         (error) => {
           toast({
-            title: "Erreur de localisation",
-            description: "Impossible d'obtenir votre position",
+            title: translations.locationError[language],
+            description: translations.locationErrorDesc[language],
             variant: "destructive",
           });
         }
@@ -123,17 +123,16 @@ const PlacesScreen = ({ onBack }: PlacesScreenProps) => {
 
   return (
     <div className="min-h-screen bg-background p-4">
-      {/* Header */}
       <div className="flex items-center justify-between mb-6">
-        <Button 
-          variant="ghost" 
-          size="sm" 
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={onBack}
           className="text-muted-foreground"
         >
-          ← Retour
+          {translations.back[language]}
         </Button>
-        <h1 className="text-xl font-semibold font-inter">Lieux à proximité</h1>
+        <h1 className="text-xl font-semibold font-inter">{translations.placesTitle[language]}</h1>
         <Button
           variant="outline"
           size="icon"
@@ -143,14 +142,13 @@ const PlacesScreen = ({ onBack }: PlacesScreenProps) => {
         </Button>
       </div>
 
-      {/* Search */}
       <Card className="mb-4">
         <CardContent className="pt-4">
           <div className="flex gap-2">
             <Input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Rechercher un lieu..."
+              placeholder={translations.searchPlaceholder[language]}
               className="flex-1"
               onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
             />
@@ -161,10 +159,9 @@ const PlacesScreen = ({ onBack }: PlacesScreenProps) => {
         </CardContent>
       </Card>
 
-      {/* Quick Actions */}
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle className="text-sm">Recherches fréquentes</CardTitle>
+          <CardTitle className="text-sm">{translations.frequentSearches[language]}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-4 gap-3">
@@ -183,10 +180,9 @@ const PlacesScreen = ({ onBack }: PlacesScreenProps) => {
         </CardContent>
       </Card>
 
-      {/* Results */}
       {places.length > 0 && (
         <div className="space-y-3">
-          <h2 className="text-lg font-semibold font-inter">Résultats</h2>
+          <h2 className="text-lg font-semibold font-inter">{translations.results[language]}</h2>
           {places.map((place) => (
             <Card key={place.id} className="cursor-pointer hover:shadow-md transition-shadow">
               <CardContent className="p-4">
@@ -228,12 +224,11 @@ const PlacesScreen = ({ onBack }: PlacesScreenProps) => {
         </div>
       )}
 
-      {/* Empty State */}
       {places.length === 0 && searchQuery && !isLoading && (
         <div className="text-center py-8">
           <MapPin className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-          <p className="text-muted-foreground">Aucun lieu trouvé</p>
-          <p className="text-sm text-muted-foreground">Essayez une autre recherche</p>
+          <p className="text-muted-foreground">{translations.noResults[language]}</p>
+          <p className="text-sm text-muted-foreground">{translations.tryAnotherSearch[language]}</p>
         </div>
       )}
     </div>

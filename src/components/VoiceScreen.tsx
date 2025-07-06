@@ -3,11 +3,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Mic, MicOff } from "lucide-react";
 
+import { useLanguage, translations } from "@/hooks/useLanguage";
+
 interface VoiceScreenProps {
   onBack: () => void;
 }
 
 const VoiceScreen = ({ onBack }: VoiceScreenProps) => {
+  const { language } = useLanguage();
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [response, setResponse] = useState('');
@@ -90,11 +93,11 @@ const VoiceScreen = ({ onBack }: VoiceScreenProps) => {
           onClick={onBack}
           className="text-muted-foreground"
         >
-          ← Retour
+          {translations.back[language]}
         </Button>
         <div className="text-center">
-          <h2 className="font-semibold font-inter">Assistant Vocal</h2>
-          <p className="text-xs text-muted-foreground font-cairo">مساعد صوتي</p>
+          <h2 className="font-semibold font-inter">{translations.voiceTitle[language]}</h2>
+          <p className="text-xs text-muted-foreground font-cairo">{translations.voiceTitle[language === 'french' ? 'darija' : 'french']}</p>
         </div>
         <div className="w-16"></div>
       </div>
@@ -133,19 +136,19 @@ const VoiceScreen = ({ onBack }: VoiceScreenProps) => {
           {isListening ? (
             <>
               <h3 className="text-xl font-semibold text-primary font-inter">
-                Je t'écoute...
+                {translations.voiceListening[language]}
               </h3>
               <p className="text-sm text-muted-foreground font-cairo">
-                ...قاعد نسمع فيك
+                {translations.voiceListening[language === 'french' ? 'darija' : 'french']}
               </p>
             </>
           ) : (
             <>
               <h3 className="text-xl font-semibold text-foreground font-inter">
-                Appuyez pour parler
+                {translations.voiceStatus[language]}
               </h3>
               <p className="text-sm text-muted-foreground font-cairo">
-                اضغط باش تحكي
+                {translations.voiceStatus[language === 'french' ? 'darija' : 'french']}
               </p>
             </>
           )}
@@ -156,7 +159,7 @@ const VoiceScreen = ({ onBack }: VoiceScreenProps) => {
           <Card className="w-full max-w-md">
             <CardContent className="p-4 text-center">
               <p className="text-sm text-muted-foreground mb-2 font-inter">
-                Vous avez dit :
+                {translations.youSaid[language]}
               </p>
               <p className={`text-lg font-semibold ${
                 isArabic(transcript) ? 'font-cairo text-right' : 'font-inter'
@@ -172,7 +175,7 @@ const VoiceScreen = ({ onBack }: VoiceScreenProps) => {
           <Card className="w-full max-w-md bg-gradient-primary text-primary-foreground">
             <CardContent className="p-4 text-center">
               <p className="text-sm opacity-90 mb-2 font-inter">
-                Fatima répond :
+                {translations.fatimaResponds[language]}
               </p>
               <p className={`text-lg font-semibold ${
                 isArabic(response) ? 'font-cairo text-right' : 'font-inter'
@@ -187,7 +190,7 @@ const VoiceScreen = ({ onBack }: VoiceScreenProps) => {
         {!isListening && !transcript && (
           <div className="w-full max-w-md space-y-3">
             <h4 className="text-sm font-semibold text-center text-muted-foreground font-inter">
-              Exemples de questions :
+              {translations.sampleQuestions[language]}
             </h4>
             <div className="grid grid-cols-1 gap-2">
               {sampleQuestions.slice(0, 3).map((question, index) => (

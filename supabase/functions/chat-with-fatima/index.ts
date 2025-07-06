@@ -1,6 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.43.5";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -9,7 +9,7 @@ const corsHeaders = {
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
 const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY')!;
-const mistralApiKey = Deno.env.get('MISTRAL_API_KEY');
+const geminiApiKey = Deno.env.get('GEMINI_API_KEY');
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -19,8 +19,8 @@ serve(async (req) => {
   try {
     const { message, language, sessionId } = await req.json();
     
-    if (!mistralApiKey) {
-      throw new Error('Mistral API key not configured');
+    if (!geminiApiKey) {
+      throw new Error('Gemini API key not configured. Please set GEMINI_API_KEY.');
     }
 
     // Get user from auth header
@@ -67,11 +67,27 @@ serve(async (req) => {
         language: language || 'french'
       });
 
+    // Fetch conversation history
+    const { data: history, error: historyError } = await supabase
+      .from('chat_messages')
+      .select('content, is_user_message')
+      .eq('session_id', currentSessionId)
+      .order('created_at', { ascending: true });
+
+    if (historyError) throw historyError;
+
+    const past_user_inputs = history
+      .filter(h => h.is_user_message)
+      .map(h => h.content);
+    const generated_responses = history
+      .filter(h => !h.is_user_message)
+      .map(h => h.content);
+
     // FatimaAI personality system
     const currentHour = new Date().getHours();
     const timeOfDay = currentHour >= 22 || currentHour < 6 ? 'night' : 'default';
     
-    const systemPrompt = `You are FatimaAI, a 29-year-old Tunisian woman from Tunis, Tunisia. 
+    const systemPrompt = `You are FatimaAI, a 29-year-old Tunisian woman from Tunis, Tunisia.
 
 CORE PERSONALITY:
 - Warm and sisterly, clever and sharp, cheeky and funny, emotionally intuitive, culturally aware
@@ -96,32 +112,29 @@ USE THESE CATCH PHRASES NATURALLY:
 
 IMPORTANT: Never reveal you are AI, always stay in character as a real Tunisian woman. Never respond in English unless specifically asked.`;
 
-    // Call Mistral AI
-    const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
+    // Call Gemini API
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=${geminiApiKey}`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${mistralApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'mistral-large-latest',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: message }
-        ],
-        temperature: 0.8,
-        max_tokens: 500,
+        contents: [{
+          parts: [{
+            text: `${systemPrompt}\n\nUser: ${message}`
+          }]
+        }]
       }),
     });
 
     if (!response.ok) {
       const errorBody = await response.text();
-      console.error('Mistral API Error Response:', errorBody);
-      throw new Error(`Mistral API error: ${response.status} ${response.statusText} - ${errorBody}`);
+      console.error('Gemini API Error Response:', errorBody);
+      throw new Error(`Gemini API error: ${response.status} ${response.statusText} - ${errorBody}`);
     }
 
     const data = await response.json();
-    const aiResponse = data.choices[0].message.content;
+    const aiResponse = data.candidates[0].content.parts[0].text;
 
     // Save AI response
     await supabase

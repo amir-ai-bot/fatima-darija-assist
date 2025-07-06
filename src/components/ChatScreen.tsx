@@ -7,6 +7,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/components/ui/use-toast";
 import { useVoiceRecognition } from "@/hooks/useVoiceRecognition";
 
+import { useLanguage, translations } from "@/hooks/useLanguage";
+
 interface Message {
   id: string;
   text: string;
@@ -20,6 +22,7 @@ interface ChatScreenProps {
 }
 
 const ChatScreen = ({ onBack }: ChatScreenProps) => {
+  const { language } = useLanguage();
   const { user } = useAuth();
   const { toast } = useToast();
   const [messages, setMessages] = useState<Message[]>([]);
@@ -145,11 +148,11 @@ const ChatScreen = ({ onBack }: ChatScreenProps) => {
           onClick={onBack}
           className="text-muted-foreground"
         >
-          ← Retour
+          {translations.back[language]}
         </Button>
         <div className="text-center">
-          <h2 className="font-semibold font-inter">Fatima AI</h2>
-          <p className="text-xs text-muted-foreground">En ligne</p>
+          <h2 className="font-semibold font-inter">{translations.chatTitle[language]}</h2>
+          <p className="text-xs text-muted-foreground">{translations.online[language]}</p>
         </div>
         <div className="w-16"></div>
       </div>
@@ -188,7 +191,7 @@ const ChatScreen = ({ onBack }: ChatScreenProps) => {
             <div className="w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center mb-2 voice-wave">
               <Mic className="w-6 h-6 text-primary-foreground" />
             </div>
-            <p className="text-sm text-muted-foreground font-inter">Je t'écoute...</p>
+            <p className="text-sm text-muted-foreground font-inter">{translations.voiceListening[language]}</p>
           </div>
         </div>
       )}
@@ -210,7 +213,7 @@ const ChatScreen = ({ onBack }: ChatScreenProps) => {
               type="text"
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
-              placeholder="Tapez votre message..."
+              placeholder={translations.chatPlaceholder[language]}
               className="flex-1 bg-transparent border-none outline-none font-inter"
               onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
               disabled={isLoading || !user}

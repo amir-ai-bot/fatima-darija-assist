@@ -6,11 +6,14 @@ import { ArrowLeftRight, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 
+import { useLanguage, translations } from "@/hooks/useLanguage";
+
 interface TranslateScreenProps {
   onBack: () => void;
 }
 
 const TranslateScreen = ({ onBack }: TranslateScreenProps) => {
+  const { language } = useLanguage();
   const { toast } = useToast();
   const [inputText, setInputText] = useState('');
   const [translatedText, setTranslatedText] = useState('');
@@ -58,13 +61,12 @@ const TranslateScreen = ({ onBack }: TranslateScreenProps) => {
           onClick={onBack}
           className="text-muted-foreground"
         >
-          ← Retour
+          {translations.back[language]}
         </Button>
-        <h1 className="text-xl font-semibold font-inter">Traducteur</h1>
+        <h1 className="text-xl font-semibold font-inter">{translations.translateTitle[language]}</h1>
         <div className="w-16"></div>
       </div>
 
-      {/* Language Direction */}
       <Card className="mb-4">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
@@ -98,37 +100,35 @@ const TranslateScreen = ({ onBack }: TranslateScreenProps) => {
         </CardHeader>
       </Card>
 
-      {/* Input */}
       <Card className="mb-4">
         <CardHeader>
           <CardTitle className="text-sm">
-            {direction === 'darija-french' ? 'Écrivez en Darija' : 'Écrivez en Français'}
+            {direction === 'darija-french' ? translations.translateFrom[language] : translations.translateTo[language]}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <Textarea
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
-            placeholder={direction === 'darija-french' ? 'كيف الصحة؟' : 'Comment ça va ?'}
+            placeholder={translations.translatePlaceholder[language]}
             className={`min-h-[120px] ${direction === 'darija-french' ? 'font-cairo text-right' : 'font-inter'}`}
             dir={direction === 'darija-french' ? 'rtl' : 'ltr'}
           />
-          <Button 
+          <Button
             onClick={handleTranslate}
             disabled={!inputText.trim() || isLoading}
             className="w-full mt-3"
           >
-            {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Traduire'}
+            {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : translations.translateButton[language]}
           </Button>
         </CardContent>
       </Card>
 
-      {/* Output */}
       {translatedText && (
         <Card>
           <CardHeader>
             <CardTitle className="text-sm">
-              {direction === 'darija-french' ? 'Traduction en Français' : 'Traduction en Darija'}
+              {direction === 'darija-french' ? translations.translateTo[language] : translations.translateFrom[language]}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -140,10 +140,9 @@ const TranslateScreen = ({ onBack }: TranslateScreenProps) => {
         </Card>
       )}
 
-      {/* Examples */}
       <Card className="mt-6">
         <CardHeader>
-          <CardTitle className="text-sm">Exemples courants</CardTitle>
+          <CardTitle className="text-sm">{translations.examples[language]}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="flex justify-between items-center text-xs">

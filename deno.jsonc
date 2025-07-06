@@ -12,5 +12,10 @@
     "files": {
       "include": ["supabase/functions/"]
     }
-  }
+  },
+  "tasks": {
+    "start": "deno run --allow-net --allow-env --watch supabase/functions/index.ts"
+  },
+  "deno.enable": true,
+  "deno.unstable": true
 }
