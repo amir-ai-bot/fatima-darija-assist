@@ -461,5 +461,9 @@ export const translations = {
   signOutError: {
     french: "Erreur lors de la déconnexion",
     darija: "خطأ في تسجيل الخروج"
+  },
+  adminPanel: {
+    french: "Administration",
+    darija: "الإدارة"
   }
 };

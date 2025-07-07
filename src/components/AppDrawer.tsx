@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
-import { Menu, User, History, Settings, LogOut, Edit } from "lucide-react";
+import { Menu, User, History, Settings, LogOut, Shield } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage, translations } from "@/hooks/useLanguage";
 import { supabase } from "@/integrations/supabase/client";
@@ -20,7 +20,7 @@ interface AppDrawerProps {
 }
 
 const AppDrawer = ({ onNavigate }: AppDrawerProps) => {
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const { language } = useLanguage();
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
@@ -97,6 +97,17 @@ const AppDrawer = ({ onNavigate }: AppDrawerProps) => {
             <Settings className="w-4 h-4 mr-3" />
             {translations.settings[language]}
           </Button>
+          
+          {isAdmin && (
+            <Button
+              variant="ghost"
+              onClick={() => handleNavigate("admin")}
+              className="w-full justify-start"
+            >
+              <Shield className="w-4 h-4 mr-3" />
+              {translations.adminPanel[language]}
+            </Button>
+          )}
           
           <Separator className="my-4" />
           

@@ -9,7 +9,7 @@ import { Camera, Upload, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import { useLanguage, translations } from "@/hooks/useLanguage";
+import { useLanguage, translations, Language } from "@/hooks/useLanguage";
 
 interface ProfileEditScreenProps {
   onBack: () => void;
@@ -102,6 +102,33 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
     }
   };
 
+  const getErrorMessage = (error: any, language: Language) => {
+    if (error?.code === '23505') {
+      return {
+        title: language === 'french' ? 'Profil déjà existant' : 'الملف الشخصي موجود بالفعل',
+        description: language === 'french' 
+          ? 'Votre profil existe déjà. Les modifications ont été appliquées.'
+          : 'ملفك الشخصي موجود بالفعل. تم تطبيق التغييرات.'
+      };
+    }
+    
+    if (error?.code === '42501') {
+      return {
+        title: language === 'french' ? 'Autorisation refusée' : 'تم رفض الإذن',
+        description: language === 'french' 
+          ? 'Vous n\'êtes pas autorisé à effectuer cette action.'
+          : 'ليس لديك إذن لتنفيذ هذا الإجراء.'
+      };
+    }
+
+    return {
+      title: language === 'french' ? 'Erreur' : 'خطأ',
+      description: language === 'french' 
+        ? 'Une erreur inattendue s\'est produite. Veuillez réessayer.'
+        : 'حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.'
+    };
+  };
+
   const handleSave = async () => {
     if (!user) return;
 
@@ -115,19 +142,22 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
           description: profile.description,
           avatar_url: profile.avatar_url,
           updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'user_id'
         });
 
       if (error) throw error;
 
       toast({
-        title: "Success",
-        description: "Profile updated successfully!",
+        title: language === 'french' ? 'Succès' : 'نجح',
+        description: language === 'french' ? 'Profil mis à jour avec succès!' : 'تم تحديث الملف الشخصي بنجاح!',
       });
     } catch (error) {
       console.error('Error updating profile:', error);
+      const errorMsg = getErrorMessage(error, language);
       toast({
-        title: "Error",
-        description: "Could not update profile.",
+        title: errorMsg.title,
+        description: errorMsg.description,
         variant: "destructive",
       });
     } finally {

@@ -13,10 +13,11 @@ import NewsScreen from "@/components/NewsScreen";
 import ChatHistoryScreen from "@/components/ChatHistoryScreen";
 import ProfileEditScreen from "@/components/ProfileEditScreen";
 import SubscriptionScreen from "@/components/SubscriptionScreen";
+import AdminPanel from "@/components/AdminPanel";
 import AppDrawer from "@/components/AppDrawer";
 import { useAuth } from "@/hooks/useAuth";
 
-type Screen = 'welcome' | 'dashboard' | 'chat' | 'voice' | 'translate' | 'places' | 'settings' | 'news' | 'history' | 'profile' | 'subscription';
+type Screen = 'welcome' | 'dashboard' | 'chat' | 'voice' | 'translate' | 'places' | 'settings' | 'news' | 'history' | 'profile' | 'subscription' | 'admin';
 
 const Index = () => {
   const { user, loading } = useAuth();
@@ -87,6 +88,8 @@ const Index = () => {
         return <ProfileEditScreen onBack={handleBack} />;
       case 'subscription':
         return <SubscriptionScreen onBack={handleBack} />;
+      case 'admin':
+        return <AdminPanel onBack={handleBack} />;
       default:
         return <WelcomeScreen onStart={handleStart} />;
     }

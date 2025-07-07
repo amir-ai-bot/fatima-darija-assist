@@ -6,12 +6,16 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   signOut: () => Promise<void>;
+  isAdmin: boolean;
+  checkingRole: boolean;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
-  signOut: async () => {}
+  signOut: async () => {},
+  isAdmin: false,
+  checkingRole: false
 });
 
 export const useAuth = () => {
@@ -29,11 +33,35 @@ interface AuthProviderProps {
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [checkingRole, setCheckingRole] = useState(false);
+
+  const checkAdminRole = async (userId: string) => {
+    setCheckingRole(true);
+    try {
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .eq('role', 'admin')
+        .single();
+      
+      setIsAdmin(!!data && !error);
+    } catch (error) {
+      console.error('Error checking admin role:', error);
+      setIsAdmin(false);
+    } finally {
+      setCheckingRole(false);
+    }
+  };
 
   useEffect(() => {
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
+      if (session?.user) {
+        checkAdminRole(session.user.id);
+      }
       setLoading(false);
     });
 
@@ -41,6 +69,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         setUser(session?.user ?? null);
+        if (session?.user) {
+          checkAdminRole(session.user.id);
+        } else {
+          setIsAdmin(false);
+        }
         setLoading(false);
       }
     );
@@ -53,12 +86,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     if (error) {
       console.error('Error signing out:', error);
     }
+    setIsAdmin(false);
   };
 
   const value = {
     user,
     loading,
-    signOut
+    signOut,
+    isAdmin,
+    checkingRole
   };
 
   return (
