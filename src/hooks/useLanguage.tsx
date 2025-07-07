@@ -437,5 +437,29 @@ export const translations = {
   subscription: {
     french: "Abonnement",
     darija: "الاشتراك"
+  },
+  signOut: {
+    french: "Se déconnecter",
+    darija: "تسجيل الخروج"
+  },
+  chatHistory: {
+    french: "Historique des chats",
+    darija: "تاريخ المحادثات"
+  },
+  error: {
+    french: "Erreur",
+    darija: "خطأ"
+  },
+  signOutSuccess: {
+    french: "Déconnexion réussie",
+    darija: "تم تسجيل الخروج بنجاح"
+  },
+  signOutSuccessDesc: {
+    french: "Vous avez été déconnecté avec succès",
+    darija: "تم تسجيل خروجك بنجاح"
+  },
+  signOutError: {
+    french: "Erreur lors de la déconnexion",
+    darija: "خطأ في تسجيل الخروج"
   }
 };

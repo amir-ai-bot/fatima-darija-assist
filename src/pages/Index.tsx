@@ -13,6 +13,7 @@ import NewsScreen from "@/components/NewsScreen";
 import ChatHistoryScreen from "@/components/ChatHistoryScreen";
 import ProfileEditScreen from "@/components/ProfileEditScreen";
 import SubscriptionScreen from "@/components/SubscriptionScreen";
+import AppDrawer from "@/components/AppDrawer";
 import { useAuth } from "@/hooks/useAuth";
 
 type Screen = 'welcome' | 'dashboard' | 'chat' | 'voice' | 'translate' | 'places' | 'settings' | 'news' | 'history' | 'profile' | 'subscription';
@@ -53,6 +54,7 @@ const Index = () => {
       case 'dashboard':
         return (
           <div className="relative">
+            <AppDrawer onNavigate={navigateToScreen} />
             <Button
               variant="ghost"
               size="icon"
