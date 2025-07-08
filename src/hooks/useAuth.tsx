@@ -43,10 +43,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         .from('user_roles')
         .select('role')
         .eq('user_id', userId)
-        .eq('role', 'admin')
-        .single();
-      
-      setIsAdmin(!!data && !error);
+        .eq('role', 'admin');
+
+      if (error) {
+        console.error('Error checking admin role:', error);
+        setIsAdmin(false);
+      } else {
+        setIsAdmin(data != null && data.length > 0);
+      }
     } catch (error) {
       console.error('Error checking admin role:', error);
       setIsAdmin(false);

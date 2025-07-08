@@ -450,6 +450,10 @@ export const translations = {
     french: "Erreur",
     darija: "خطأ"
   },
+  success: {
+    french: "Succès",
+    darija: "نجح"
+  },
   signOutSuccess: {
     french: "Déconnexion réussie",
     darija: "تم تسجيل الخروج بنجاح"
@@ -465,5 +469,25 @@ export const translations = {
   adminPanel: {
     french: "Administration",
     darija: "الإدارة"
+  },
+  resetPassword: {
+    french: "Réinitialiser le mot de passe",
+    darija: "إعادة تعيين كلمة المرور"
+  },
+  passwordResetDescription: {
+    french: "Entrez votre email pour recevoir un lien de réinitialisation.",
+    darija: "أدخل بريدك الإلكتروني لتلقي رابط إعادة التعيين."
+  },
+  passwordResetEmailSent: {
+    french: "Un email de réinitialisation a été envoyé.",
+    darija: "تم إرسال بريد إلكتروني لإعادة التعيين."
+  },
+  email: {
+    french: "Email",
+    darija: "البريد الإلكتروني"
+  },
+  sendResetLink: {
+    french: "Envoyer le lien de réinitialisation",
+    darija: "إرسال رابط إعادة التعيين"
   }
 };

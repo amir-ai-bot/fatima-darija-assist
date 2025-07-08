@@ -58,7 +58,7 @@ const AppDrawer = ({ onNavigate }: AppDrawerProps) => {
         <DrawerHeader className="text-left">
           <DrawerTitle className="flex items-center gap-3">
             <Avatar className="w-12 h-12">
-              <AvatarImage src={profile?.avatar_url || "/placeholder.svg"} />
+              <AvatarImage src={profile?.avatar_url || "placeholder.svg"} />
               <AvatarFallback>
                 {user?.email?.charAt(0).toUpperCase() || "U"}
               </AvatarFallback>

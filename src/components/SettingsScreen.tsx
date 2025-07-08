@@ -117,7 +117,7 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
             </div>
           </CardHeader>
           <CardContent>
-            <Button variant="outline" className="w-full" onClick={() => window.location.href = '#profile'}>
+            <Button variant="outline" className="w-full" onClick={() => window.location.href = '/profile'}>
               <User className="w-4 h-4 mr-2" />
               {translations.editProfile[currentLanguage]}
             </Button>

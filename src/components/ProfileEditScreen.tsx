@@ -380,35 +380,24 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
                 </Label>
               </div>
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="professional" id="professional" />
-                <Label htmlFor="professional" className="flex-1">
+                <RadioGroupItem value="funny_sassy" id="funny_sassy" />
+                <Label htmlFor="funny_sassy" className="flex-1">
                   <div className="font-medium">
-                    {language === 'french' ? 'Professionnelle' : 'مهنية'}
+                    {language === 'french' ? 'Amusante et impertinente' : 'مضحكة ووقحة'}
                   </div>
                   <div className="text-sm text-muted-foreground">
-                    {language === 'french' ? 'Formelle et efficace dans ses réponses' : 'رسمية وفعالة في إجاباتها'}
+                    {language === 'french' ? 'Pleine d\'esprit et de plaisanteries' : 'مليئة بالذكاء والنكات'}
                   </div>
                 </Label>
               </div>
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="playful" id="playful" />
-                <Label htmlFor="playful" className="flex-1">
+                <RadioGroupItem value="wise_calm" id="wise_calm" />
+                <Label htmlFor="wise_calm" className="flex-1">
                   <div className="font-medium">
-                    {language === 'french' ? 'Joueuse et dynamique' : 'مرحة ونشيطة'}
+                    {language === 'french' ? 'Sage et calme' : 'حكيمة وهادئة'}
                   </div>
                   <div className="text-sm text-muted-foreground">
-                    {language === 'french' ? 'Pleine d\'énergie et d\'humour' : 'مليئة بالطاقة والمرح'}
-                  </div>
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="wise_mentor" id="wise" />
-                <Label htmlFor="wise" className="flex-1">
-                  <div className="font-medium">
-                    {language === 'french' ? 'Sage et bienveillante' : 'حكيمة ومتفهمة'}
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    {language === 'french' ? 'Comme une grande sœur qui donne de bons conseils' : 'مثل أخت كبيرة تقدم نصائح جيدة'}
+                    {language === 'french' ? 'Réfléchie et posée dans ses réponses' : 'متأنية وهادئة في ردودها'}
                   </div>
                 </Label>
               </div>

@@ -72,13 +72,13 @@ const AdminPanel = ({ onBack }: AdminPanelProps) => {
         supabase.from('subscribers').select('*', { count: 'exact', head: true })
       ]);
 
-      setStats({
+      setStats(prevStats => ({
+        ...prevStats,
         totalUsers: usersCount || 0,
-        admins: users.filter(u => u.role === 'admin').length,
         chatSessions: sessionsCount || 0,
         messages: messagesCount || 0,
         subscribers: subscribersCount || 0
-      });
+      }));
     } catch (error) {
       console.error('Error fetching stats:', error);
     }
@@ -86,29 +86,15 @@ const AdminPanel = ({ onBack }: AdminPanelProps) => {
 
   const fetchUsers = async () => {
     try {
-      // Fetch users from profiles table
-      const { data: profiles, error: profilesError } = await supabase
-        .from('profiles')
-        .select('user_id, display_name, created_at');
+      const { data, error } = await supabase.functions.invoke('get-users');
 
-      if (profilesError) throw profilesError;
+      if (error) throw error;
 
-      // Fetch user roles
-      const { data: roles, error: rolesError } = await supabase
-        .from('user_roles')
-        .select('user_id, role');
-
-      if (rolesError) throw rolesError;
-
-      // Combine data
-      const usersWithRoles = profiles?.map(profile => ({
-        id: profile.user_id,
-        email: profile.display_name || 'Unknown',
-        created_at: profile.created_at,
-        role: roles?.find(r => r.user_id === profile.user_id)?.role || 'user'
-      })) || [];
-
-      setUsers(usersWithRoles);
+      setUsers(data);
+      setStats(prevStats => ({
+        ...prevStats,
+        admins: data.filter((u: User) => u.role === 'admin').length
+      }));
     } catch (error) {
       console.error('Error fetching users:', error);
       toast({

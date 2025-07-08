@@ -21,7 +21,6 @@ const AuthScreen = ({ onSuccess }: AuthScreenProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showVerificationMessage, setShowVerificationMessage] = useState(false);
-  const [showRecoveryMessage, setShowRecoveryMessage] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -71,40 +70,6 @@ const AuthScreen = ({ onSuccess }: AuthScreenProps) => {
       toast({
         title: "Erreur",
         description: description,
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleForgotPassword = async () => {
-    if (!formData.email) {
-      toast({
-        title: "Email requis",
-        description: "Veuillez saisir votre adresse email pour récupérer votre mot de passe.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(formData.email, {
-        redirectTo: `${window.location.origin}/`,
-      });
-
-      if (error) throw error;
-
-      setShowRecoveryMessage(true);
-      toast({
-        title: "Email envoyé!",
-        description: "Vérifiez votre boîte mail pour réinitialiser votre mot de passe.",
-      });
-    } catch (error: any) {
-      toast({
-        title: "Erreur",
-        description: error.message,
         variant: "destructive",
       });
     } finally {
@@ -164,19 +129,6 @@ const AuthScreen = ({ onSuccess }: AuthScreenProps) => {
                 setIsSignUp(false);
               }}>
                 {translations.verified[language]}
-              </Button>
-            </div>
-          ) : showRecoveryMessage ? (
-            <div className="text-center space-y-4">
-              <p className="text-muted-foreground">
-                Un email de récupération a été envoyé à <strong>{formData.email}</strong>. 
-                Veuillez vérifier votre boîte mail et suivre les instructions pour réinitialiser votre mot de passe.
-              </p>
-              <Button onClick={() => {
-                setShowRecoveryMessage(false);
-                setFormData(prev => ({...prev, password: ''}));
-              }}>
-                Retour à la connexion
               </Button>
             </div>
           ) : (
@@ -249,7 +201,7 @@ const AuthScreen = ({ onSuccess }: AuthScreenProps) => {
                     <Button
                       type="button"
                       variant="link"
-                      onClick={handleForgotPassword}
+                      onClick={() => window.location.href = '/password-reset'}
                       disabled={isLoading}
                       className="text-sm font-inter"
                     >
