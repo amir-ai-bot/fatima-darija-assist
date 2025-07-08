@@ -88,20 +88,6 @@ const DashboardScreen = ({ onNavigate }: DashboardScreenProps) => {
 
   const extraFeatures = [
     {
-      icon: History,
-      title: translations.history[language],
-      description: language === 'french' ? 'Vos conversations' : 'محادثاتك',
-      color: "bg-gradient-accent",
-      action: () => onNavigate('history')
-    },
-    {
-      icon: User,
-      title: translations.profileEdit[language],
-      description: language === 'french' ? 'Modifier profil' : 'تعديل الملف',
-      color: "bg-gradient-primary",
-      action: () => onNavigate('profile')
-    },
-    {
       icon: Crown,
       title: translations.subscription[language],
       description: language === 'french' ? 'Plans premium' : 'الخطط المميزة',
