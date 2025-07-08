@@ -57,17 +57,27 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
       }
 
       if (data) {
+        const defaultFatimaStyle = {
+          hair_color: '#2D1810',
+          hair_style: 'long',
+          makeup_style: 'natural',
+          outfit_color: '#8B4513'
+        };
+
+        let fatimaStyle = defaultFatimaStyle;
+        if (data.fatima_style && typeof data.fatima_style === 'object' && !Array.isArray(data.fatima_style)) {
+          const style = data.fatima_style as Record<string, any>;
+          if (style.hair_color && style.hair_style && style.makeup_style && style.outfit_color) {
+            fatimaStyle = style as typeof defaultFatimaStyle;
+          }
+        }
+
         setProfile({
           display_name: data.display_name || '',
           description: data.description || '',
           avatar_url: data.avatar_url || '',
           personality: data.personality || 'friendly_warm',
-          fatima_style: data.fatima_style || {
-            hair_color: '#2D1810',
-            hair_style: 'long',
-            makeup_style: 'natural',
-            outfit_color: '#8B4513'
-          }
+          fatima_style: fatimaStyle
         });
       }
     } catch (error) {
