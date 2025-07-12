@@ -57,13 +57,26 @@ const NewsScreen = ({ onBack }: NewsScreenProps) => {
     }
 
     try {
-      const { data, error } = await supabase.functions.invoke('fetch-tunisian-news');
-      
-      if (error) throw error;
-      
-      const newsData = data as NewsResponse;
-      setNews(newsData.news || []);
-      setLastUpdated(newsData.lastUpdated);
+      const [{ data: functionData, error: functionError }, { data: tableData, error: tableError }] = await Promise.all([
+        supabase.functions.invoke('fetch-tunisian-news'),
+        supabase.from('news').select('*').order('created_at', { ascending: false })
+      ]);
+
+      if (functionError) throw functionError;
+      if (tableError) throw tableError;
+
+      const newsFromFunction = (functionData as NewsResponse)?.news || [];
+      const newsFromTable = (tableData || []).map(article => ({
+        ...article,
+        url: `/news/${article.id}`,
+        image: article.image_url
+      }));
+
+      const combinedNews = [...newsFromTable, ...newsFromFunction];
+
+      const combinedNewsData = { news: combinedNews, lastUpdated: new Date().toISOString() };
+      setNews(combinedNewsData.news || []);
+      setLastUpdated(combinedNewsData.lastUpdated);
       
       if (isRefresh) {
         toast({

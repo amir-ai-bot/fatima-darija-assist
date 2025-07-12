@@ -66,9 +66,9 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
 
         let fatimaStyle = defaultFatimaStyle;
         if (data.fatima_style && typeof data.fatima_style === 'object' && !Array.isArray(data.fatima_style)) {
-          const style = data.fatima_style as Record<string, any>;
+          const style = data.fatima_style as Record<string, string>;
           if (style.hair_color && style.hair_style && style.makeup_style && style.outfit_color) {
-            fatimaStyle = style as typeof defaultFatimaStyle;
+            fatimaStyle = style;
           }
         }
 
@@ -128,25 +128,26 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
     }
   };
 
-  const getErrorMessage = (error: any, language: Language) => {
-    if (error?.code === '23505') {
-      return {
-        title: language === 'french' ? 'Profil déjà existant' : 'الملف الشخصي موجود بالفعل',
-        description: language === 'french' 
-          ? 'Votre profil existe déjà. Les modifications ont été appliquées.'
-          : 'ملفك الشخصي موجود بالفعل. تم تطبيق التغييرات.'
-      };
+  const getErrorMessage = (error: unknown, language: Language) => {
+    if (error && typeof error === 'object' && 'code' in error) {
+      const err = error as { code: string };
+      if (err.code === '23505') {
+        return {
+          title: language === 'french' ? 'Profil déjà existant' : 'الملف الشخصي موجود بالفعل',
+          description: language === 'french' 
+            ? 'Votre profil existe déjà. Les modifications ont été appliquées.'
+            : 'ملفك الشخصي موجود بالفعل. تم تطبيق التغييرات.'
+        };
+      }
+      if (err.code === '42501') {
+        return {
+          title: language === 'french' ? 'Autorisation refusée' : 'تم رفض الإذن',
+          description: language === 'french' 
+            ? 'Vous n\'êtes pas autorisé à effectuer cette action.'
+            : 'ليس لديك إذن لتنفيذ هذا الإجراء.'
+        };
+      }
     }
-    
-    if (error?.code === '42501') {
-      return {
-        title: language === 'french' ? 'Autorisation refusée' : 'تم رفض الإذن',
-        description: language === 'french' 
-          ? 'Vous n\'êtes pas autorisé à effectuer cette action.'
-          : 'ليس لديك إذن لتنفيذ هذا الإجراء.'
-      };
-    }
-
     return {
       title: language === 'french' ? 'Erreur' : 'خطأ',
       description: language === 'french' 

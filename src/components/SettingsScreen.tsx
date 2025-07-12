@@ -22,7 +22,7 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
   const [darkMode, setDarkMode] = useState(document.documentElement.classList.contains('dark'));
   const { language: currentLanguage, setLanguage } = useLanguage();
   const [personality, setPersonality] = useState('friendly_warm');
-  const [profile, setProfile] = useState<any>(null);
+  const [profile, setProfile] = useState<Record<string, unknown> | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -46,7 +46,7 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
     }
   };
 
-  const updateProfile = async (updates: any) => {
+  const updateProfile = async (updates: Record<string, unknown>) => {
     if (!user) return;
     const { error } = await supabase
       .from('profiles')

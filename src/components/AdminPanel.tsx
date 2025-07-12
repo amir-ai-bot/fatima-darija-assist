@@ -14,6 +14,9 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/hooks/useLanguage";
+import { useAuth } from "@/hooks/useAuth";
+import FatimaCustomizer from "./FatimaCustomizer";
+import NewsManager from "./NewsManager";
 
 interface User {
   id: string;
@@ -27,6 +30,7 @@ interface AdminPanelProps {
 }
 
 const AdminPanel = ({ onBack }: AdminPanelProps) => {
+  const { isAdmin, checkingRole } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
@@ -40,8 +44,30 @@ const AdminPanel = ({ onBack }: AdminPanelProps) => {
   const { language } = useLanguage();
 
   useEffect(() => {
-    fetchAllData();
-  }, []);
+    if (isAdmin) {
+      fetchAllData();
+    }
+  }, [isAdmin]);
+
+  if (checkingRole) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div>Checking permissions...</div>
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold">Unauthorized</h2>
+          <p>You do not have permission to view this page.</p>
+          <Button onClick={onBack} className="mt-4">Go Back</Button>
+        </div>
+      </div>
+    );
+  }
 
   const fetchAllData = async () => {
     setLoading(true);
@@ -178,7 +204,7 @@ const AdminPanel = ({ onBack }: AdminPanelProps) => {
           </div>
         ) : (
           <Tabs defaultValue="overview" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="flex flex-wrap justify-center gap-2">
               <TabsTrigger value="overview" className="flex items-center gap-2">
                 <BarChart3 className="h-4 w-4" />
                 {language === 'french' ? 'Vue d\'ensemble' : 'نظرة عامة'}
@@ -194,6 +220,14 @@ const AdminPanel = ({ onBack }: AdminPanelProps) => {
               <TabsTrigger value="system" className="flex items-center gap-2">
                 <Server className="h-4 w-4" />
                 {language === 'french' ? 'Système' : 'النظام'}
+              </TabsTrigger>
+              <TabsTrigger value="appearance" className="flex items-center gap-2">
+                <Palette className="h-4 w-4" />
+                {language === 'french' ? 'Apparence' : 'المظهر'}
+              </TabsTrigger>
+              <TabsTrigger value="news" className="flex items-center gap-2">
+                <Globe className="h-4 w-4" />
+                {language === 'french' ? 'Actualités' : 'الأخبار'}
               </TabsTrigger>
             </TabsList>
 
@@ -522,6 +556,12 @@ const AdminPanel = ({ onBack }: AdminPanelProps) => {
                   </CardContent>
                 </Card>
               </div>
+            </TabsContent>
+            <TabsContent value="appearance">
+              <FatimaCustomizer />
+            </TabsContent>
+            <TabsContent value="news">
+              <NewsManager />
             </TabsContent>
           </Tabs>
         )}

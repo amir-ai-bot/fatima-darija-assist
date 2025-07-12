@@ -34,10 +34,10 @@ const TranslateScreen = ({ onBack }: TranslateScreenProps) => {
 
       if (error) throw error;
       setTranslatedText(data.translation);
-    } catch (err: any) {
+    } catch (err: unknown) {
       toast({
         title: "Erreur de traduction",
-        description: err.message || 'Une erreur est survenue',
+        description: err instanceof Error ? err.message : 'Une erreur est survenue',
         variant: "destructive",
       });
     } finally {

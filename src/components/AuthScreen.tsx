@@ -62,10 +62,13 @@ const AuthScreen = ({ onSuccess }: AuthScreenProps) => {
         });
         onSuccess();
       }
-    } catch (error: any) {
-      let description = error.message;
-      if (error.message.includes('Invalid login credentials')) {
-        description = "Email ou mot de passe incorrect. Si vous venez de créer votre compte, veuillez vérifier votre email pour l'activer.";
+    } catch (error: unknown) {
+      let description = 'An unexpected error occurred.';
+      if (error instanceof Error) {
+        description = error.message;
+        if (error.message.includes('Invalid login credentials')) {
+          description = "Email ou mot de passe incorrect. Si vous venez de créer votre compte, veuillez vérifier votre email pour l'activer.";
+        }
       }
       toast({
         title: "Erreur",
@@ -88,10 +91,14 @@ const AuthScreen = ({ onSuccess }: AuthScreenProps) => {
       });
 
       if (error) throw error;
-    } catch (error: any) {
+    } catch (error: unknown) {
+      let description = 'An unexpected error occurred.';
+      if (error instanceof Error) {
+        description = error.message;
+      }
       toast({
         title: "Erreur",
-        description: error.message,
+        description: description,
         variant: "destructive",
       });
     } finally {
