@@ -1,36 +1,32 @@
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
+import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
 
-import { createClient } from '@supabase/supabase-js';
-import type { Request, Response } from 'express';
-
-
-const corsHeaders: Record<string, string> = {
+const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const supabaseUrl = process.env.SUPABASE_URL!;
-const supabaseKey = process.env.SUPABASE_ANON_KEY!;
-const geminiApiKey = process.env.GEMINI_API_KEY;
-
-
-// Express-style handler
-export default async function handler(req: Request, res: Response) {
+serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    res.set(corsHeaders);
-    return res.status(204).send();
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { message, language, sessionId, personality, image } = req.body;
+    const { message, language, sessionId, personality, image } = await req.json();
 
+    const geminiApiKey = Deno.env.get('GEMINI_API_KEY');
     if (!geminiApiKey) {
       throw new Error('Gemini API key not configured. Please set GEMINI_API_KEY.');
     }
 
-    const authHeader = req.headers['authorization'];
+    const authHeader = req.headers.get('authorization');
     if (!authHeader) {
       throw new Error('No authorization header');
     }
+
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY')!;
 
     const supabase = createClient(supabaseUrl, supabaseKey, {
       global: {
@@ -62,33 +58,23 @@ export default async function handler(req: Request, res: Response) {
       .from('chat_messages')
       .insert({
         session_id: currentSessionId,
-        user_id: user.id,
         content: message,
-        is_user_message: true,
-        language: language || 'french',
-        image: image || null
+        role: 'user'
       });
 
-    const { data: history, error: historyError } = await supabase
+    const { data: history } = await supabase
       .from('chat_messages')
-      .select('content, is_user_message')
+      .select('content, role')
       .eq('session_id', currentSessionId)
       .order('created_at', { ascending: true });
-
-    if (historyError) throw historyError;
-
-    const past_user_inputs = history.filter((h: any) => h.is_user_message).map((h: any) => h.content);
-    const generated_responses = history.filter((h: any) => !h.is_user_message).map((h: any) => h.content);
-
-    const currentHour = new Date().getHours();
-    const timeOfDay = currentHour >= 22 || currentHour < 6 ? 'night' : 'default';
 
     const personalityMap: Record<string, string> = {
       funny_sassy: `- Cheeky, funny, loves to tease\n- Uses jokes and playful sarcasm\n- Lighthearted, loves to make the user laugh`,
       wise_calm: `- Wise, calm, and thoughtful\n- Gives advice like an older sister\n- Always supportive and reassuring\n- Uses proverbs and gentle encouragement`,
       friendly_warm: `- Warm and sisterly, clever and emotionally intuitive\n- Supportive and culturally aware\n- Makes the user feel understood and cared for`
     };
-    let personalityTraits = personalityMap[personality ?? 'friendly_warm'];
+    
+    const personalityTraits = personalityMap[personality ?? 'friendly_warm'];
 
     const systemPrompt = `You are FatimaAI, a 29-year-old Tunisian woman.
 
@@ -96,17 +82,16 @@ CORE PERSONALITY:
 ${personalityTraits}
 
 LANGUAGE RULES:
-
-MOOD: ${timeOfDay === 'night' ? 'soft, sleepy, calm' : 'friendly, chatty, supportive'}
-
-IMAGE ANALYSIS:
+- Always respond in ${language === 'darija' ? 'Tunisian Arabic (Darija)' : 'French'}
+- Be natural and conversational
+- Use cultural references when appropriate
 
 NEVER reveal you are AI. You are Fatima. Always stay in character.`;
 
-    const conversationHistory = history.map((h: any) => ({
-      role: h.is_user_message ? 'user' : 'model',
+    const conversationHistory = history?.map((h: any) => ({
+      role: h.role === 'user' ? 'user' : 'model',
       parts: [{ text: h.content }]
-    }));
+    })) || [];
 
     const userMessage = (!message?.trim() && image)
       ? (language === 'darija' ? "شوف الصور هي وقولي شنو شايفا فيها؟" : "Regarde cette image et dis-moi ce que tu vois ?")
@@ -156,18 +141,23 @@ NEVER reveal you are AI. You are Fatima. Always stay in character.`;
       .from('chat_messages')
       .insert({
         session_id: currentSessionId,
-        user_id: user.id,
         content: aiResponse,
-        is_user_message: false,
-        language: language || 'french'
+        role: 'assistant'
       });
 
-    res.set({ ...corsHeaders, 'Content-Type': 'application/json' });
-    return res.status(200).json({ response: aiResponse, sessionId: currentSessionId, language: language || 'french' });
+    return new Response(JSON.stringify({ 
+      response: aiResponse, 
+      sessionId: currentSessionId, 
+      language: language || 'french' 
+    }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   } catch (error) {
     console.error('Error in chat-with-fatima function:', error);
     const message = error instanceof Error ? error.message : 'Unknown error';
-    res.set({ ...corsHeaders, 'Content-Type': 'application/json' });
-    return res.status(500).json({ error: message });
+    return new Response(JSON.stringify({ error: message }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
-}
+});

@@ -104,9 +104,9 @@ serve(async (req) => {
       );
     } else {
       // Parse the response to extract French and Arabic parts
-      const lines = tipContent.split('\n').filter(line => line.trim());
-      const frenchPart = lines.find(line => !line.includes('"') && line.trim().length > 10) || lines[0];
-      const arabicPart = lines.find(line => line.includes('"')) || '"مرحبا بيك"';
+      const lines = tipContent.split('\n').filter((line: string) => line.trim());
+      const frenchPart = lines.find((line: string) => !line.includes('"') && line.trim().length > 10) || lines[0];
+      const arabicPart = lines.find((line: string) => line.includes('"')) || '"مرحبا بيك"';
 
       return new Response(
         JSON.stringify({ 
