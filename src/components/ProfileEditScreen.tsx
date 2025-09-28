@@ -66,9 +66,14 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
 
         let fatimaStyle = defaultFatimaStyle;
         if (data.fatima_style && typeof data.fatima_style === 'object' && !Array.isArray(data.fatima_style)) {
-          const style = data.fatima_style as Record<string, string>;
+          const style = data.fatima_style as any;
           if (style.hair_color && style.hair_style && style.makeup_style && style.outfit_color) {
-            fatimaStyle = style;
+            fatimaStyle = {
+              hair_color: style.hair_color,
+              hair_style: style.hair_style,
+              makeup_style: style.makeup_style,
+              outfit_color: style.outfit_color
+            };
           }
         }
 
