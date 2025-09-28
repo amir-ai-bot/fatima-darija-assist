@@ -24,7 +24,7 @@ const AppDrawer = ({ onNavigate }: AppDrawerProps) => {
   const { language } = useLanguage();
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
-  const [profile, setProfile] = useState<Record<string, unknown> | null>(null);
+  const [profile, setProfile] = useState<{ avatar_url?: string; display_name?: string } | null>(null);
 
   const handleSignOut = async () => {
     try {
