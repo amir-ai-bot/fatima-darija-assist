@@ -1,5 +1,7 @@
 # Fatima Darija Assist
 
+[![CI](https://github.com/amir-ai-bot/fatima-darija-assist/actions/workflows/ci.yml/badge.svg)](https://github.com/amir-ai-bot/fatima-darija-assist/actions/workflows/ci.yml)
+
 Fatima Darija Assist is a Tunisian Darija and French assistant application. It combines a React interface, Supabase authentication and storage, Edge Functions, chat history, translation features, and LLM-backed assistant workflows.
 
 The project is positioned as a practical AI assistant application rather than a generic chatbot. It focuses on language support, user sessions, personalization, and backend integration.
