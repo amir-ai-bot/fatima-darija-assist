@@ -1,73 +1,61 @@
-# Welcome to your Lovable project
+# Fatima Darija Assist
 
-## Project info
+Fatima Darija Assist is a Tunisian Darija and French assistant application. It combines a React interface, Supabase authentication and storage, Edge Functions, chat history, translation features, and LLM-backed assistant workflows.
 
-**URL**: https://lovable.dev/projects/3cfa740f-bd90-410f-b96d-cb4c61551476
+The project is positioned as a practical AI assistant application rather than a generic chatbot. It focuses on language support, user sessions, personalization, and backend integration.
 
-## How can I edit this code?
+## Features
 
-There are several ways of editing your application.
+- Chat interface for Tunisian Darija and French
+- Supabase authentication and user profiles
+- Chat session and message history
+- Translation workflow between Darija and French
+- Voice-oriented UI screens
+- Supabase Edge Functions for assistant, translation, news, and account workflows
+- Admin and subscription-related surfaces
 
-**Use Lovable**
+## Tech Stack
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/3cfa740f-bd90-410f-b96d-cb4c61551476) and start prompting.
+- React
+- TypeScript
+- Vite
+- Tailwind CSS
+- shadcn/ui
+- Supabase
+- Supabase Edge Functions
+- LLM API integrations
 
-Changes made via Lovable will be committed automatically to this repo.
+## Project Structure
 
-**Use your preferred IDE**
+```text
+fatima-darija-assist/
+|-- public/
+|-- src/
+|   |-- components/
+|   |-- hooks/
+|   |-- integrations/
+|   |-- pages/
+|   `-- services/
+|-- supabase/
+|   |-- functions/
+|   `-- migrations/
+|-- package.json
+`-- README.md
+```
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## Run Locally
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+```bash
+npm install
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+For Supabase functions and database migrations, use the Supabase CLI with a configured local or remote project.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Environment
 
-**Use GitHub Codespaces**
+Keep local secrets outside Git. Use `.env.example` as a template for local values.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Notes
 
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/3cfa740f-bd90-410f-b96d-cb4c61551476) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+This repository demonstrates assistant-style product thinking, frontend state management, Supabase-backed backend work, and practical multilingual UX for Tunisian users.
